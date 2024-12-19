@@ -1,0 +1,4 @@
+{
+    "name": "Build against latest docker image",
+    "description": "Builds the package using the latest otsdaq-suite docker image"
+}

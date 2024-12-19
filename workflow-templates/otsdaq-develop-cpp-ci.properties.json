@@ -1,0 +1,4 @@
+{
+    "name": "Build packages with develop",
+    "description": "Builds the HEAD of develop for all otsdaq-suite packages"
+}

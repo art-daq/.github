@@ -1,0 +1,4 @@
+{
+    "name": "Run the unit tests",
+    "description": "Runs the unit tests of an otsdaq-suite development area"
+}
