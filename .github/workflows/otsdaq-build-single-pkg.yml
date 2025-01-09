@@ -53,16 +53,17 @@ jobs:
         source /opt/otsdaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
-        cd srcs
-        if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
-        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
-                
-        # Have to re-add here in case architecture is different
-        cd /opt/otsdaq
-        spack config add config:mpd_user_dir:/opt/otsdaq/spack-repos/mpd/
+        mkdir /scratch/art-daq/build_\$REPO
+        cd /scratch/art-daq/build_\$REPO
         
-        spack mpd build 2>&1 | tee -a /scratch/art-daq/build.log
+        export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
+        echo "Compiler is \$compiler"
+        cp /opt/otsdaq/srcs/CMakePresets.json /scratch/art-daq/\$REPO
+        echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
+        cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
+        
+        echo "Starting build"
+        make 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         
         echo "Spack install completed with status code \$res"

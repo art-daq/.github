@@ -1,0 +1,77 @@
+name: "Check whitespace using Git"
+    
+on:
+  workflow_call:
+    inputs:
+        against-ref:
+            required: false
+            type: string
+
+jobs:
+
+  check_git_whitespace:
+    name: "Check Git whitespace"
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout pkg
+      uses: actions/checkout@main
+      with:
+        repository: ${{ github.repository }}
+        path: scratch/${{ github.repository }}
+        fetch-depth: 0
+
+    - name: Check for whitespace errors using Git
+      run: |
+        cd scratch/${{ github.repository }}
+        
+        cat << EOT > check_whitespace.sh
+        #!/bin/bash
+
+        against=${{ inputs.against-ref }}
+        if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
+            against=\$(git hash-object -t tree /dev/null)
+        fi
+        echo "Checking for whitespace differences introduced since commit \$against"
+        
+        # Cross platform projects tend to avoid non-ASCII filenames; prevent
+        # them from being added to the repository. We exploit the fact that the
+        # printable range starts at the space character and ends with tilde.
+        badchar=\$(git diff --cached --name-only --diff-filter=A  \$against | \
+        LC_ALL=C tr -d 'A-Za-z0-9/\n_.-' | wc -c)
+        if [ \$badchar != 0 ]
+        then
+            echo "Check failed: cannot add a file name with non-ASCII or blank char."
+            exit 1
+        fi
+
+        names=\$( git diff --cached --name-only --diff-filter=AM  \$against )
+        
+        rc=0
+        for name in \$names
+        do
+            bname=\$( basename \$name )
+            ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
+            if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
+               || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
+               || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl"; then
+
+                # check whitespace and return non-zero if not allowed
+            
+                git diff-index --check --cached \$against \$name
+                [ \$? -ne 0 ] && rc=1
+
+                if [[ -e "\$name" && \$(tail -c1 "\$name" | wc -l) -eq 0 ]]; then
+                    echo "Commit check failed: \$name does not have a terminal newline"
+                    rc=1
+                fi
+            fi
+        done
+
+        if [ \$rc -ne 0 ] ; then
+            echo "Github CI detected format errors!"
+        fi
+        exit \$rc
+        EOT
+        chmod +x check_whitespace.sh
+        ./check_whitespace.sh

@@ -1,0 +1,4 @@
+{
+    "name": "Use git to perform basic whitespace checks",
+    "description": "Checks out the package, and checks for whitespace issues versus the given commit"
+}
