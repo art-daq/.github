@@ -54,7 +54,7 @@ jobs:
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
             if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
-               || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl"; then
+               || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl" ]]; then
 
                 # check whitespace and return non-zero if not allowed
             
