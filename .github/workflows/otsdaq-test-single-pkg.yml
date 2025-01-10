@@ -61,10 +61,16 @@ jobs:
         cp /opt/otsdaq/srcs/CMakePresets.json /scratch/art-daq/\$REPO
         echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
         cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
-        
-        echo "Starting tests"
-        make test 2>&1 | tee -a /scratch/art-daq/build.log
+
+        echo "Compiling code"
+        make 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        
+        if [ \$res -eq 0 ]; then
+            echo "Starting tests"
+            make test 2>&1 | tee -a /scratch/art-daq/build.log
+            res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        fi
 
         exit \$res
         EOT
