@@ -81,8 +81,19 @@ jobs:
         
         spack load --first llvm
         
+        files=""
+        for name in \$names;do
+            bname=\$( basename \$name )
+            ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
+            if [[ "\$ext" == "hh" || "\$ext" == "cc" \
+               || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
+               ]]; then
+               files="\$files \$name"
+            fi
+        done
+
         echo "Running clang-format on changed files"
-        clang-format -n -Werror \$names  2>&1 | tee -a /scratch/art-daq/build.log
+        clang-format -n -Werror \$files  2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         echo "Clang-format completed with status code \$res"
