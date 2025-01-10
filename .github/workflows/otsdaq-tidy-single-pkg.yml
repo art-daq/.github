@@ -80,7 +80,7 @@ jobs:
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
         
-        spack load llvm
+        spack load --first llvm
         spack compiler find
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
@@ -105,7 +105,7 @@ jobs:
         
     - name: Check build log for success
       run: |
-        grep "Clang-tidy completed with status code \$res" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "Clang-tidy completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
