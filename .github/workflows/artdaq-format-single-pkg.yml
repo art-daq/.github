@@ -1,4 +1,4 @@
-name: Run Clang-Tidy Workflow (artdaq version)
+name: Run Clang-Format Workflow (artdaq version)
 
 on:
   workflow_call:
@@ -9,8 +9,8 @@ on:
 
 jobs:
 
- tidy_single_pkg:
-    name: tidy single pkg
+ format_single_pkg:
+    name: format single pkg
     runs-on: ubuntu-latest
     
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -47,7 +47,7 @@ jobs:
         path: scratch/${{ github.repository }}
         fetch-depth: 0
 
-    - name: run clang-tidy in docker container with cvmfs bind mount
+    - name: run clang-format in docker container with cvmfs bind mount
       run: |
       
         cd $GITHUB_WORKSPACE/scratch
