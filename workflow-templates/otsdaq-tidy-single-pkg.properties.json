@@ -1,0 +1,4 @@
+{
+    "name": "Run Clang-Tidy on changed files",
+    "description": "Runs clang-tidy on all changed files using the latest otsdaq docker image"
+}

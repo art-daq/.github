@@ -1,0 +1,120 @@
+name: Run Clang-Tidy Workflow (otsdaq version)
+
+on:
+  workflow_call:
+    inputs:
+        against-ref:
+            required: false
+            type: string
+
+jobs:
+
+ tidy_single_pkg:
+    name: tidy single pkg
+    runs-on: ubuntu-latest
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+
+    - uses: cvmfs-contrib/github-action-cvmfs@main
+
+    - name: change dir permission
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
+
+    - name: Cache cvmfs cache
+      id: cvmfs_cache
+      uses: actions/cache@main
+      with:
+        path: /var/lib/cvmfs/shared
+        key: cachecvmfs
+
+    - name: restore dir permission
+      run: |
+        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
+        sudo chmod -R go-rwx /var/lib/cvmfs
+
+    - name: test cvmfs
+      run: |
+        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
+    
+    - name: Checkout pkg
+      uses: actions/checkout@main
+      with:
+        repository: ${{ github.repository }}
+        path: scratch/${{ github.repository }}
+        fetch-depth: 0
+
+    - name: run clang-tidy in docker container with cvmfs bind mount
+      run: |
+      
+        cd $GITHUB_WORKSPACE/scratch
+                
+        against=${{ inputs.against-ref }}
+        if [ "x$against" == "x" ] || [ "x$against" == "x0" ]; then
+            against=$(git hash-object -t tree /dev/null)
+        fi
+        echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
+        cd ${{ github.repository }}
+        names=$( git diff --cached --name-only --diff-filter=AM  $against )
+
+        if [ "x$names" == "x" ]; then
+            echo "No changed files"
+            echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
+            exit 0
+        fi
+
+        cd $GITHUB_WORKSPACE/scratch
+
+        cat << EOT > build_pkg.sh
+        #!/bin/bash
+        
+        cd /opt/otsdaq
+        source /opt/otsdaq/setup_ots.sh || exit 1
+        
+        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+        names="$names"
+        
+        mkdir /scratch/art-daq/build_\$REPO
+        cd /scratch/art-daq/build_\$REPO
+        
+        spack load llvm
+        spack compiler find
+
+        export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
+        echo "Compiler is \$compiler"
+        cp /opt/otsdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
+        
+        echo "Running clang-tidy on changed files"
+        run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/art-daq/build.log
+        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+
+        echo "Clang-tidy completed with status code \$res"
+        echo "Clang-tidy completed with status code \$res" >>/scratch/art-daq/build.log
+        
+        exit \$res
+        EOT
+        chmod +x build_pkg.sh
+        cat build_pkg.sh
+
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/otsdaq-spack:latest /scratch/build_pkg.sh
+        
+    - name: Check build log for success
+      run: |
+        grep "Clang-tidy completed with status code \$res" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: upload build log file
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: build_log
+        path: ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: change dir permission again
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
