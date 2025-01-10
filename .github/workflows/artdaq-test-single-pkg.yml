@@ -59,8 +59,8 @@ jobs:
         export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
         echo "Compiler is \$compiler"
         cp /opt/artdaq/srcs/CMakePresets.json /scratch/art-daq/\$REPO
-        echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
-        cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
+        echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev"
+        cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev
         
         echo "Compiling code"
         make 2>&1 | tee -a /scratch/art-daq/build.log
