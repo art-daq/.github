@@ -65,6 +65,7 @@ jobs:
             echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
             exit 0
         fi
+        echo "Changed files to tidy: $names"
 
         cd $GITHUB_WORKSPACE/scratch
 
