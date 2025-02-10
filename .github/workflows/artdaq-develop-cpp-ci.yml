@@ -62,7 +62,9 @@ jobs:
         if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
         cp -pr /scratch/art-daq/\$REPO \$pkgname
         cd \$pkgname
-        ref=`git describe --all`
+        git config --global --add safe.directory \$PWD
+        export ref=\$(git describe --all)
+        echo "Described current ref as \${ref}"
         branch=develop
         
         if [[ "x\${ref}" =~ "xheads/" ]]; then
@@ -76,7 +78,7 @@ jobs:
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
-            git checkout $branch
+            git checkout \$branch
             git stash pop
             git pull
             cd ..
