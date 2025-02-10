@@ -64,12 +64,13 @@ jobs:
         cd \$pkgname
         ref=`git describe --all`
         branch=develop
-
+        
         if [[ "x\${ref}" =~ "xheads/" ]]; then
+            echo "Setting branch to \${ref//heads\//}"
             branch=\${ref//heads\//}
         fi
 
-        echo "Checking out $branch"
+        echo "Checking out \$branch"
         cd  /opt/artdaq/srcs
         for pkg in */;do 
             echo "Updating package \$pkg"

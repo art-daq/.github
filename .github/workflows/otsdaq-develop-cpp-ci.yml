@@ -66,10 +66,11 @@ jobs:
         branch=develop
 
         if [[ "x\${ref}" =~ "xheads/" ]]; then
+            echo "Setting branch to \${ref//heads\//}"
             branch=\${ref//heads\//}
         fi
 
-        echo "Checking out $branch"
+        echo "Checking out \$branch"
         cd  /opt/otsdaq/srcs
         for pkg in */;do 
             echo "Updating package \$pkg"
