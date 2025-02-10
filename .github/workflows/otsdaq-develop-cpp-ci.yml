@@ -56,15 +56,16 @@ jobs:
         source /opt/otsdaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/art-daq/\$REPO to srcs \${REPO//_/-}"
+        export pkgname=\${REPO//_/-}
+        echo "Copying /scratch/art-daq/\$REPO to srcs \$pkgname"
         cd srcs
-        if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
-        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
-        cd \${REPO//_/-}
+        if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
+        cp -pr /scratch/art-daq/\$REPO \$pkgname
+        cd \$pkgname
         ref=`git describe --all`
         branch=develop
 
-        if [[ ${ref} =~ "heads/" ]]; then
+        if [[ "x${ref}" =~ "xheads/" ]]; then
             branch=${ref//heads\//}
         fi
 
