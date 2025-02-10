@@ -43,6 +43,7 @@ jobs:
       with:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
+        fetch-depth: 0
 
     - name: run build in docker container with cvmfs bind mount
       run: |
