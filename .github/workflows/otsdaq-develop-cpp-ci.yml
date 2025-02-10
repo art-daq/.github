@@ -65,8 +65,8 @@ jobs:
         ref=`git describe --all`
         branch=develop
 
-        if [[ "x${ref}" =~ "xheads/" ]]; then
-            branch=${ref//heads\//}
+        if [[ "x\${ref}" =~ "xheads/" ]]; then
+            branch=\${ref//heads\//}
         fi
 
         echo "Checking out $branch"
