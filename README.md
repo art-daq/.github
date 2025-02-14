@@ -138,3 +138,10 @@
 [![Test Single Pkg Workflow](https://github.com/art-daq/trace/actions/workflows/artdaq-test-single-pkg.yml/badge.svg)](https://github.com/art-daq/trace/actions/workflows/artdaq-test-single-pkg.yml)
 [![Tidy Single Pkg Workflow](https://github.com/art-daq/trace/actions/workflows/artdaq-tidy-single-pkg.yml/badge.svg)](https://github.com/art-daq/trace/actions/workflows/artdaq-tidy-single-pkg.yml)
 
+## daq-docker
+[![Add issue to project](https://github.com/art-daq/daq-docker/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/track_new_issues.yml)
+[![Add pull request to project](https://github.com/art-daq/daq-docker/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/track_new_prs.yml)
+[![Build alma9-spack docker image](https://github.com/art-daq/daq-docker/actions/workflows/alma9-spack-base.yaml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/alma9-spack-base.yaml)
+[![Build artdaq-spack docker image (self hosted)](https://github.com/art-daq/daq-docker/actions/workflows/artdaq-spack-selfhosted.yaml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/artdaq-spack-selfhosted.yaml)
+[![Build otsdaq-spack docker image (self hosted)](https://github.com/art-daq/daq-docker/actions/workflows/otsdaq-spack-selfhosted.yaml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/otsdaq-spack-selfhosted.yaml)
+[![Git Whitespace Check Workflow](https://github.com/art-daq/daq-docker/actions/workflows/git-whitespace.yml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/git-whitespace.yml)
