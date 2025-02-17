@@ -65,7 +65,6 @@
 ## otsdaq
 [![Add issue to project](https://github.com/art-daq/otsdaq/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/otsdaq-format-single-pkg.yml)
@@ -76,7 +75,6 @@
 ## otsdaq-components
 [![Add issue to project](https://github.com/art-daq/otsdaq-components/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq-components/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq-components/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-components/actions/workflows/otsdaq-format-single-pkg.yml)
@@ -87,7 +85,6 @@
 ## otsdaq-demo
 [![Add issue to project](https://github.com/art-daq/otsdaq-demo/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq-demo/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq-demo/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-demo/actions/workflows/otsdaq-format-single-pkg.yml)
@@ -98,7 +95,6 @@
 ## otsdaq-epics
 [![Add issue to project](https://github.com/art-daq/otsdaq-epics/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq-epics/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq-epics/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-epics/actions/workflows/otsdaq-format-single-pkg.yml)
@@ -109,7 +105,6 @@
 ## otsdaq-prepmodernication
 [![Add issue to project](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-prepmodernization/actions/workflows/otsdaq-format-single-pkg.yml)
@@ -120,7 +115,6 @@
 ## otsdaq-utilities
 [![Add issue to project](https://github.com/art-daq/otsdaq-utilities/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq-utilities/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/track_new_prs.yml)
-[![Auto approve](https://github.com/art-daq/otsdaq-utilities/actions/workflows/auto_approve.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/auto_approve.yml)
 [![Build Single Pkg Workflow](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-build-single-pkg.yml)
 [![build-develop](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-develop-cpp-ci.yml)
 [![Format Single Pkg Workflow](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/otsdaq-utilities/actions/workflows/otsdaq-format-single-pkg.yml)
