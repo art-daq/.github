@@ -72,16 +72,6 @@
 [![Test Single Pkg Workflow](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-test-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-test-single-pkg.yml)
 [![Tidy Single Pkg Workflow](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-tidy-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-tidy-single-pkg.yml)
 
-## artdaq-pcp-mmv-plugin
-[![Add issue to project](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/track_new_issues.yml)
-[![Add pull request to project](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/track_new_prs.yml)
-[![Build Single Pkg Workflow](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-build-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-build-single-pkg.yml)
-[![build-develop](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-develop-cpp-ci.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-develop-cpp-ci.yml)
-[![Format Single Pkg Workflow](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-format-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-format-single-pkg.yml)
-[![Git Whitespace Check Workflow](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/git-whitespace.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/git-whitespace.yml)
-[![Test Single Pkg Workflow](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-test-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-test-single-pkg.yml)
-[![Tidy Single Pkg Workflow](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-tidy-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-pcp-mmv-plugin/actions/workflows/artdaq-tidy-single-pkg.yml)
-
 ## otsdaq
 [![Add issue to project](https://github.com/art-daq/otsdaq/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/otsdaq/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/otsdaq/actions/workflows/track_new_prs.yml)
