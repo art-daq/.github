@@ -65,7 +65,7 @@ jobs:
         rc=0
         for name in \$names
         do
-            if [ `echo $name | grep -vE $exclude_regex` == "" ]; then 
+            if [[ "x`echo $name | grep -vE $exclude_regex`" == "x" ]]; then 
               echo "Skipping excluded file $name"
               continue 
             fi
