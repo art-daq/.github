@@ -32,7 +32,7 @@ jobs:
         cat << EOT > check_whitespace.sh
         #!/bin/bash
         
-        excluded_dirs=${{ inputs.exclude-directories }}
+        excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
         for dir in \$excluded_dirs[@];do 
