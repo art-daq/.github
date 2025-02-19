@@ -6,6 +6,10 @@ on:
         against-ref:
             required: false
             type: string
+        exclude-directories:
+            required: false
+            type: string
+
 
 jobs:
 
@@ -27,6 +31,16 @@ jobs:
         
         cat << EOT > check_whitespace.sh
         #!/bin/bash
+        
+        excluded_dirs=${{ inputs.exclude-directories }}
+        exclude_regex="^(nothingtoseehere"
+
+        for dir in $excluded_dirs[@];do 
+          if [ -d $dir ]; then
+            exclude_regex="${exclude_regex}|$dir"
+          fi
+        done
+        exclude_regex="${exclude_regex})"
 
         against=${{ inputs.against-ref }}
         if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
@@ -37,7 +51,7 @@ jobs:
         # Cross platform projects tend to avoid non-ASCII filenames; prevent
         # them from being added to the repository. We exploit the fact that the
         # printable range starts at the space character and ends with tilde.
-        badchar=\$(git diff --cached --name-only --diff-filter=A  \$against | \
+        badchar=\$(git diff --cached --name-only --diff-filter=A  \$against | grep -vE $exclude_regex | \
         LC_ALL=C tr -d 'A-Za-z0-9/\n_.@+-' | wc -c)
         if [ \$badchar != 0 ]
         then
@@ -45,11 +59,16 @@ jobs:
             exit 1
         fi
 
+
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against )
         
         rc=0
         for name in \$names
         do
+            if [ `echo $name | grep -vE $exclude_regex` == "" ]; then 
+              echo "Skipping excluded file $name"
+              continue 
+            fi
             bname=\$( basename \$name )
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
             if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
