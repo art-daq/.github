@@ -41,7 +41,7 @@ jobs:
           fi
         done
         exclude_regex="\${exclude_regex})"
-        echo "Excluding files from checks via ${exclude_regex}"
+        echo "Excluding files from checks via \${exclude_regex}"
 
         against=${{ inputs.against-ref }}
         if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
