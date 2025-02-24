@@ -2,7 +2,7 @@
 
 # Repo Action Status
 
-<details>
+<details open>
   <summary>artdaq-suite</summary>
 
 ### [artdaq](https://github.com/art-daq/artdaq)
@@ -85,7 +85,7 @@
 [![Test Single Pkg Workflow](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-test-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-test-single-pkg.yml)
 [![Tidy Single Pkg Workflow](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-tidy-single-pkg.yml/badge.svg)](https://github.com/art-daq/artdaq-epics-plugin/actions/workflows/artdaq-tidy-single-pkg.yml)
 
-<details>
+<details open>
   <summary>artdaq-demo</summary>
   
 ## [artdaq-core-demo](https://github.com/art-daq/artdaq-core-demo)
@@ -112,7 +112,7 @@
 
 </details>
 
-<details>
+<details open>
   <summary>otsdaq-suite</summary>
 
   
@@ -178,6 +178,9 @@
 
 </details>
 
+<details open>
+  <summary>Github CI and Spack</summary>
+  
 ## [daq-docker](https://github.com/art-daq/daq-docker)
 [![Add issue to project](https://github.com/art-daq/daq-docker/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/daq-docker/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/daq-docker/actions/workflows/track_new_prs.yml)
@@ -190,3 +193,5 @@
 [![Add issue to project](https://github.com/art-daq/artdaq-spack/actions/workflows/track_new_issues.yml/badge.svg)](https://github.com/art-daq/artdaq-spack/actions/workflows/track_new_issues.yml)
 [![Add pull request to project](https://github.com/art-daq/artdaq-spack/actions/workflows/track_new_prs.yml/badge.svg)](https://github.com/art-daq/artdaq-spack/actions/workflows/track_new_prs.yml)
 [![Git Whitespace Check Workflow](https://github.com/art-daq/artdaq-spack/actions/workflows/git-whitespace.yml/badge.svg)](https://github.com/art-daq/artdaq-spack/actions/workflows/git-whitespace.yml)
+
+</details>
