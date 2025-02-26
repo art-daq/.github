@@ -1,5 +1,5 @@
 name: "Check whitespace using Git"
-    
+
 on:
   workflow_call:
     inputs:
@@ -28,14 +28,14 @@ jobs:
     - name: Check for whitespace errors using Git
       run: |
         cd scratch/${{ github.repository }}
-        
+
         cat << EOT > check_whitespace.sh
         #!/bin/bash
-        
+
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
-        for dir in \$excluded_dirs;do 
+        for dir in \$excluded_dirs;do
           if [ -d \$dir ]; then
             exclude_regex="\${exclude_regex}|\$dir"
           fi
@@ -48,7 +48,7 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Checking for whitespace differences introduced since commit \$against"
-        
+
         # Cross platform projects tend to avoid non-ASCII filenames; prevent
         # them from being added to the repository. We exploit the fact that the
         # printable range starts at the space character and ends with tilde.
@@ -62,7 +62,7 @@ jobs:
 
 
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
-        
+
         rc=0
         for name in \$names
         do
@@ -74,7 +74,7 @@ jobs:
                || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl" ]]; then
 
                 # check whitespace and return non-zero if not allowed
-            
+
                 git diff-index --check --cached \$against \$name
                 [ \$? -ne 0 ] && rc=1
 
