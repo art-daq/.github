@@ -1,4 +1,4 @@
-name: Run Clang-Tidy Workflow (otsdaq version)
+name: Run Clang-Tidy Workflow (artdaq version)
 
 on:
   workflow_call:
@@ -12,7 +12,7 @@ jobs:
  tidy_single_pkg:
     name: tidy single pkg
     runs-on: ubuntu-latest
-
+    
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Delete huge unnecessary tools folder
@@ -38,41 +38,41 @@ jobs:
 
     - name: test cvmfs
       run: |
-        ls -l /cvmfs/fermilab.opensciencegrid.orgproducts/artdaq/spack_areas
-
+        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
+    
     - name: Checkout pkg
       uses: actions/checkout@main
       with:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
         fetch-depth: 0
-
-    - name: Restore otsdaq Image Cache if it exists
-      id: cache-docker-otsdaq
+        
+    - name: Restore artdaq Image Cache if it exists
+      id: cache-docker-artdaq
       uses: actions/cache@v3
       with:
-        path: ci/cache/docker/otsdaq
-        key: cache-docker-otsdaq
+        path: ci/cache/docker/artdaq
+        key: cache-docker-artdaq
 
-    - name: Update otsdaq Image Cache if cache miss
-      if: steps.cache-docker-otsdaq.outputs.cache-hit != 'true'
-      run: docker pull eflumerf/otsdaq-spack:latest && mkdir -p ci/cache/docker/otsdaq && docker image save eflumerf/otsdaq-spack:latest --output ./ci/cache/docker/otsdaq/otsdaq-latest.tar
+    - name: Update artdaq Image Cache if cache miss
+      if: steps.cache-docker-artdaq.outputs.cache-hit != 'true'
+      run: docker pull eflumerf/artdaq-spack:latest && mkdir -p ci/cache/docker/artdaq && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
 
-    - name: Use otsdaq Image Cache if cache hit
-      if: steps.cache-docker-otsdaq.outputs.cache-hit == 'true'
-      run: docker image load --input ./ci/cache/docker/otsdaq/otsdaq-latest.tar
+    - name: Use artdaq Image Cache if cache hit
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
+      run: docker image load --input ./ci/cache/docker/artdaq/artdaq-latest.tar
 
-    - name: Check for otsdaq Image Cache Updates
-      if: steps.cache-docker-otsdaq.outputs.cache-hit == 'true'
+    - name: Check for artdaq Image Cache Updates
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
       run: |
-        newimage=`docker pull eflumerf/otsdaq-spack:latest | grep -c  "Status: Downloaded newer image"`
-        [ $newimage -eq 1 ] && docker image save eflumerf/otsdaq-spack:latest --output ./ci/cache/docker/otsdaq/otsdaq-latest.tar
+        newimage=`docker pull eflumerf/artdaq-spack:latest | grep -c  "Status: Downloaded newer image"`
+        [ $newimage -eq 1 ] && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
 
     - name: run clang-tidy in docker container with cvmfs bind mount
       run: |
-
+      
         cd $GITHUB_WORKSPACE/scratch
-
+                
         against=${{ inputs.against-ref }}
         if [ "x$against" == "x" ] || [ "x$against" == "x0" ]; then
             against=$(git hash-object -t tree /dev/null)
@@ -92,39 +92,39 @@ jobs:
 
         cat << EOT > build_pkg.sh
         #!/bin/bash
-
-        cd /opt/otsdaq
-        source /opt/otsdaq/setup_otsdaq.sh || exit 1
-
+        
+        cd /opt/artdaq
+        source /opt/artdaq/setup_artdaq.sh || exit 1
+        
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         names="$names"
-
+        
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
-
+        
         spack load --first llvm
         spack compiler find
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp /opt/otsdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        cp /opt/artdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
-
+        
         echo "Running clang-tidy on changed files"
         run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         echo "Clang-tidy completed with status code \$res"
         echo "Clang-tidy completed with status code \$res" >>/scratch/art-daq/build.log
-
+        
         exit \$res
         EOT
         chmod +x build_pkg.sh
         cat build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/otsdaq-spack:latest /scratch/build_pkg.sh
-
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/artdaq-spack:latest /scratch/build_pkg.sh
+        
     - name: Check build log for success
       run: |
         grep "Clang-tidy completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
