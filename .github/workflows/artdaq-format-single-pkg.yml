@@ -47,6 +47,20 @@ jobs:
         path: scratch/${{ github.repository }}
         fetch-depth: 0
 
+    - name: Update artdaq Image Cache if cache miss
+      if: steps.cache-docker-artdaq.outputs.cache-hit != 'true'
+      run: docker pull eflumerf/artdaq-spack:latest && mkdir -p ci/cache/docker/artdaq && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
+
+    - name: Use artdaq Image Cache if cache hit
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
+      run: docker image load --input ./ci/cache/docker/artdaq/artdaq-latest.tar
+
+    - name: Check for artdaq Image Cache Updates
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
+      run: |
+        newimage=`docker pull eflumerf/artdaq-spack:latest | grep -c  "Status: Downloaded newer image"`
+        [ $newimage -eq 1 ] && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
+
     - name: run clang-format in docker container with cvmfs bind mount
       run: |
       
