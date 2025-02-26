@@ -1,4 +1,4 @@
-name: Run Clang-Tidy Workflow (otsdaq version)
+name: Run Clang-Tidy Workflow (artdaq version)
 
 on:
   workflow_call:
@@ -46,6 +46,27 @@ jobs:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
         fetch-depth: 0
+        
+    - name: Restore artdaq Image Cache if it exists
+      id: cache-docker-artdaq
+      uses: actions/cache@v3
+      with:
+        path: ci/cache/docker/artdaq
+        key: cache-docker-artdaq
+
+    - name: Update artdaq Image Cache if cache miss
+      if: steps.cache-docker-artdaq.outputs.cache-hit != 'true'
+      run: docker pull eflumerf/artdaq-spack:latest && mkdir -p ci/cache/docker/artdaq && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
+
+    - name: Use artdaq Image Cache if cache hit
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
+      run: docker image load --input ./ci/cache/docker/artdaq/artdaq-latest.tar
+
+    - name: Check for artdaq Image Cache Updates
+      if: steps.cache-docker-artdaq.outputs.cache-hit == 'true'
+      run: |
+        newimage=`docker pull eflumerf/artdaq-spack:latest | grep -c  "Status: Downloaded newer image"`
+        [ $newimage -eq 1 ] && docker image save eflumerf/artdaq-spack:latest --output ./ci/cache/docker/artdaq/artdaq-latest.tar
 
     - name: run clang-tidy in docker container with cvmfs bind mount
       run: |
@@ -72,8 +93,8 @@ jobs:
         cat << EOT > build_pkg.sh
         #!/bin/bash
         
-        cd /opt/otsdaq
-        source /opt/otsdaq/setup_ots.sh || exit 1
+        cd /opt/artdaq
+        source /opt/artdaq/setup_artdaq.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         names="$names"
@@ -86,7 +107,7 @@ jobs:
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp /opt/otsdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        cp /opt/artdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
         
@@ -102,7 +123,7 @@ jobs:
         chmod +x build_pkg.sh
         cat build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/otsdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/artdaq-spack:latest /scratch/build_pkg.sh
         
     - name: Check build log for success
       run: |
