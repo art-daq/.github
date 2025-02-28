@@ -56,7 +56,7 @@ jobs:
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
         
-        export compiler=\$(spack compiler info gcc@13.3.0|grep cxx|awk '{print \$3}')
+        export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
         echo "Compiler is \$compiler"
         cp /opt/artdaq/srcs/CMakePresets.json /scratch/art-daq/\$REPO
         echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev"
