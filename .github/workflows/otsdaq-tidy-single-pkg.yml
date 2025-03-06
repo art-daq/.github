@@ -20,22 +20,6 @@ jobs:
 
     - uses: cvmfs-contrib/github-action-cvmfs@main
 
-    - name: change dir permission
-      run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
-
-    - name: Cache cvmfs cache
-      id: cvmfs_cache
-      uses: actions/cache@main
-      with:
-        path: /var/lib/cvmfs/shared
-        key: cachecvmfs
-
-    - name: restore dir permission
-      run: |
-        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
-        sudo chmod -R go-rwx /var/lib/cvmfs
-
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
@@ -46,6 +30,29 @@ jobs:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
         fetch-depth: 0
+
+    - name: Fetch package version
+      id: version
+      run: |
+        cd $GITHUB_WORKSPACE/scratch/${{ github.repository }}
+        tag=`git describe --tags --abbrev=0`
+        echo "tag=${tag}" >>$GITHUB_OUTPUT
+
+    - name: change dir permission
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
+
+    - name: Cache cvmfs cache
+      id: cvmfs_cache
+      uses: actions/cache@main
+      with:
+        path: /var/lib/cvmfs/shared
+        key: cachecvmfs-${{ steps.version.outputs.tag }}
+
+    - name: restore dir permission
+      run: |
+        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
+        sudo chmod -R go-rwx /var/lib/cvmfs
 
     - name: Pull current Docker image
       run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
