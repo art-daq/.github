@@ -46,7 +46,7 @@ jobs:
         fetch-depth: 0
 
     - name: Pull current Docker image
-      run: docker image pull eflumerf/artdaq-spack:latest
+      run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
 
     - name: run build in docker container with cvmfs bind mount
       run: |
@@ -104,7 +104,7 @@ jobs:
         EOT
         chmod +x build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/artdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
         
     - name: Check build log for success
       run: |
