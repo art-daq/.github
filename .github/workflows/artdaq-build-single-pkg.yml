@@ -42,6 +42,9 @@ jobs:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
 
+    - name: Pull current Docker image
+      run: docker image pull eflumerf/artdaq-spack:latest
+
     - name: run build in docker container with cvmfs bind mount
       run: |
       

@@ -47,6 +47,9 @@ jobs:
         path: scratch/${{ github.repository }}
         fetch-depth: 0
 
+    - name: Pull current Docker image
+      run: docker image pull eflumerf/otsdaq-spack:latest
+
     - name: run clang-format in docker container with cvmfs bind mount
       run: |
       

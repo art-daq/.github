@@ -47,6 +47,9 @@ jobs:
         path: scratch/${{ github.repository }}
         fetch-depth: 0
 
+    - name: Pull current Docker image
+      run: docker image pull eflumerf/artdaq-spack:latest
+
     - name: run clang-tidy in docker container with cvmfs bind mount
       run: |
       
