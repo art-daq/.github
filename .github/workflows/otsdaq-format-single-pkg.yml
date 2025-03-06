@@ -35,6 +35,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/scratch/${{ github.repository }}
         tag=`git describe --tags --abbrev=0`
+        echo "Using tag $tag"
         echo "tag=${tag}" >>$GITHUB_OUTPUT
 
     - name: change dir permission
