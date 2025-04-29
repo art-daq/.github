@@ -40,7 +40,8 @@ jobs:
 
     - name: change dir permission
       run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
+        sudo mkdir -p /var/lib/cvmfs
+        sudo chmod -R 777 /var/lib/cvmfs
 
     - name: Cache cvmfs cache
       id: cvmfs_cache
@@ -51,8 +52,8 @@ jobs:
 
     - name: restore dir permission
       run: |
-        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
-        sudo chmod -R go-rwx /var/lib/cvmfs
+        sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
+        sudo chmod -R 700 /var/lib/cvmfs
 
     - name: Pull current Docker image
       run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
@@ -131,4 +132,4 @@ jobs:
 
     - name: change dir permission again
       run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
+        sudo chmod -R 777 /var/lib/cvmfs
