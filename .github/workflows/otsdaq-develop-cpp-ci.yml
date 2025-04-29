@@ -16,6 +16,9 @@ jobs:
     - name: Delete huge unnecessary tools folder
       run: rm -rf /opt/hostedtoolcache
 
+    - name: SUID for tar
+      run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+
     - uses: cvmfs-contrib/github-action-cvmfs@main
 
     - name: test cvmfs
