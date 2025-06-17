@@ -37,7 +37,8 @@ jobs:
         tag=`git describe --tags --abbrev=0`
         echo "Using tag $tag"
         echo "tag=${tag}" >>$GITHUB_OUTPUT
-        
+        echo "repo=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')" >>$GITHUB_OUTPUT
+
     - name: change dir permission
       run: |
         sudo mkdir -p /var/lib/cvmfs
@@ -85,43 +86,22 @@ jobs:
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
-        mkdir -p /scratch/art-daq/docs
-        cp -a /scratch/art-daq/build_\$REPO/doc/*.tag /scratch/art-daq/docs
-        cp -a /scratch/art-daq/build_\$REPO/doc/header.html /scratch/art-daq/docs
-        cp -a /scratch/art-daq/build_\$REPO/doc/Doxyfile /scratch/art-daq/docs
 
         exit \$res
         EOT
         chmod +x build_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
-        
+
     - name: Check build log for success
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
-        
-    - name: Doxygen Action
-      uses: mattnotmitt/doxygen-action@v1.12.0
-      with:
-        working-directory: /github/workspace/scratch/art-daq/docs
-        doxyfile-path: './Doxyfile'
 
     - name: upload build log file
       uses: actions/upload-artifact@main
       with:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
-
-    - name: Rename Doxygen output
-      run: |
-        rm -rf ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
-        mv ${{ github.workspace }}/scratch/art-daq/docs/html ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
-
-    - name: upload Doxygen directory
-      uses: actions/upload-artifact@main
-      with:
-        name: doxygen
-        path: ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
 
     - name: change dir permission again
       run: |
