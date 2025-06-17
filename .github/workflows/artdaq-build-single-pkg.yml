@@ -85,8 +85,10 @@ jobs:
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
-        mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/\$REPO
-        cp -a /scratch/art-daq/build_\$REPO/doc/html /scratch/art-daq/docs/\$REPO
+        mkdir -p /scratch/art-daq/docs
+        cp -a /scratch/art-daq/build_\$REPO/doc/*.tag /scratch/art-daq/docs
+        cp -a /scratch/art-daq/build_\$REPO/doc/header.html /scratch/art-daq/docs
+        cp -a /scratch/art-daq/build_\$REPO/doc/Doxyfile /scratch/art-daq/docs
 
         exit \$res
         EOT
@@ -97,6 +99,12 @@ jobs:
     - name: Check build log for success
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
+        
+    - name: Doxygen Action
+      uses: mattnotmitt/doxygen-action@v1.12.0
+      with:
+        working-directory: /github/workspace/scratch/art-daq/docs
+        doxyfile-path: './Doxyfile'
 
     - name: upload build log file
       uses: actions/upload-artifact@main
@@ -104,11 +112,16 @@ jobs:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
+    - name: Rename Doxygen output
+      run: |
+        rm -rf ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
+        mv ${{ github.workspace }}/scratch/art-daq/docs/html ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
+
     - name: upload Doxygen directory
       uses: actions/upload-artifact@main
       with:
         name: doxygen
-        path: ${{ github.workspace }}/scratch/art-daq/docs
+        path: ${{ github.workspace }}/scratch/art-daq/docs/${{ steps.version.outputs.repo }}
 
     - name: change dir permission again
       run: |
