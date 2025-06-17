@@ -85,6 +85,8 @@ jobs:
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
+        mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/\$REPO
+        cp -a /scratch/art-daq/build_\$REPO/doc/html /scratch/art-daq/docs/\$REPO
 
         exit \$res
         EOT
@@ -101,6 +103,12 @@ jobs:
       with:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: upload Doxygen directory
+      uses: actions/upload-artifact@main
+      with:
+        name: doxygen
+        path: ${{ github.workspace }}/scratch/art-daq/docs
 
     - name: change dir permission again
       run: |
