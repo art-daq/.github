@@ -110,6 +110,11 @@ jobs:
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
+        mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
+        for dir in `ls -d build/*/doc/html`;do
+            pkg=`echo $dir|cut -d/ -f2`
+            cp -a $dir /scratch/art-daq/docs/$pkg
+        done
 
         exit \$res
         EOT
@@ -120,6 +125,18 @@ jobs:
     - name: Check build log for success
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: upload build log file
+      uses: actions/upload-artifact@main
+      with:
+        name: build_log
+        path: ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: upload Doxygen docs
+      uses: actions/upload-artifact@main
+      with:
+        name: doxygen
+        path: ${{ github.workspace }}/scratch/art-daq/docs
 
     - name: change dir permission again
       run: |
