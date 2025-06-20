@@ -99,6 +99,7 @@ jobs:
             cd ..
         done
                 
+        export OTS_DOXY="DOIT"
         # Have to re-add here in case architecture is different
         cd /opt/otsdaq
         spack config add config:mpd_user_dir:/opt/otsdaq/spack-repos/mpd/
