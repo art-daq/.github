@@ -115,7 +115,7 @@ jobs:
 
         echo "Collecting Doxygen"
         ls -d build/*/doc/html
-        for dir in `ls -d build/*/doc/html`;do
+        for dir in build/*/doc/html;do
             pkg=`echo \$dir|cut -d/ -f2`
             echo "Copying \$dir to /scratch/art-daq/docs/\$pkg"
             cp -a \$dir /scratch/art-daq/docs/\$pkg
