@@ -110,14 +110,13 @@ jobs:
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
-
+        
         echo "Collecting Doxygen"
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
-        ls -d build/*/doc/html
         for dir in build/*/doc/html;do
-            pkg=`echo \$dir|sed 's|build/||;s|/doc/html||'`
-            echo "Copying \$dir to /scratch/art-daq/docs/\$pkg"
-            cp -a \$dir /scratch/art-daq/docs/\$pkg
+            thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
+            echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
+            cp -a \$dir /scratch/art-daq/docs/\$thispkg
         done
         echo "Contents of docs after collection"
         ls /scratch/art-daq/docs
