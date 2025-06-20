@@ -112,8 +112,12 @@ jobs:
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
+
+        echo "Collecting Doxygen"
+        ls build/*/doc
         for dir in `ls -d build/*/doc/html`;do
             pkg=`echo \$dir|cut -d/ -f2`
+            echo "Copying \$dir to /scratch/art-daq/docs/\$pkg"
             cp -a \$dir /scratch/art-daq/docs/\$pkg
         done
 
