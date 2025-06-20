@@ -117,7 +117,7 @@ jobs:
         ls -d build/*/doc/html
         set -x
         for dir in build/*/doc/html;do
-            thispkg=`echo \$dir|sed 's|build/||;s|/doc/html||'`
+            thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
             echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
             cp -a \$dir /scratch/art-daq/docs/\$thispkg
         done
