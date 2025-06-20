@@ -112,8 +112,8 @@ jobs:
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
         for dir in `ls -d build/*/doc/html`;do
-            pkg=`echo $dir|cut -d/ -f2`
-            cp -a $dir /scratch/art-daq/docs/$pkg
+            pkg=`echo \$dir|cut -d/ -f2`
+            cp -a \$dir /scratch/art-daq/docs/\$pkg
         done
 
         exit \$res
