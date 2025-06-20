@@ -38,6 +38,7 @@ jobs:
         name: doxygen
         github-token: ${{ secrets.BOT_CI_ISSUES }}
         repository: art-daq/artdaq
+        path: artdaq_doxygen
         run-id: ${{ steps.run_ids.outputs.artdaq_id }}
 
     - name: Fetch otsdaq Doxygen docs
@@ -47,9 +48,13 @@ jobs:
         github-token: ${{ secrets.BOT_CI_ISSUES }}
         repository: art-daq/otsdaq
         run-id: ${{ steps.run_ids.outputs.otsdaq_id }}
+        path: otsdaq_doxygen
 
     - name: Create index.html
       run: |
+        mkdir docs
+        mv artdaq_doxygen/* docs
+        mv otsdaq_doxygen/* docs
         cd docs
         cat << EOT > index.html
         
@@ -70,6 +75,7 @@ jobs:
         <a href="otsdaq-utilities/">otsdaq-utilities</a><br />
 
         EOT
+        cd ..
 
     - name: Upload artifacts
       uses: actions/upload-pages-artifact@v3
