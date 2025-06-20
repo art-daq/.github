@@ -114,12 +114,14 @@ jobs:
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
 
         echo "Collecting Doxygen"
-        ls build/*/doc
+        ls -d build/*/doc/html
         for dir in `ls -d build/*/doc/html`;do
             pkg=`echo \$dir|cut -d/ -f2`
             echo "Copying \$dir to /scratch/art-daq/docs/\$pkg"
             cp -a \$dir /scratch/art-daq/docs/\$pkg
         done
+        echo "Contents of docs after collection"
+        ls -d /scratch/art-daq/docs
 
         exit \$res
         EOT
