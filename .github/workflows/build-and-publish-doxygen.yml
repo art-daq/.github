@@ -15,12 +15,28 @@ jobs:
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
           
+    - name: Get workflow run IDs
+      id: run_ids
+      run: |
+        artdaq_id=$(gh run list --repo art-daq/artdaq \
+                              --workflow "build-develop" \
+                              --limit 1 \
+                              --json databaseId --jq '.[0].databaseId')
+        otsdaq_id=$(gh run list --repo art-daq/otsdaq \
+                                   --workflow "build-develop" \
+                                   --limit 1 \
+                                   --json databaseId --jq '.[0].databaseId')
+
+        echo "artdaq_id=$artdaq_id" | tee -a "$GITHUB_OUTPUT"
+        echo "otsdaq_id=$otsdaq_id" | tee -a "$GITHUB_OUTPUT"
+
     - name: Fetch artdaq Doxygen docs
       uses: actions/download-artifact@v4
       with:
         name: doxygen
         github-token: ${{ secrets.BOT_CI_ISSUES }}
         repository: art-daq/artdaq
+        run-id: ${{ steps.run_ids.outputs.artdaq_id }}
 
     - name: Fetch otsdaq Doxygen docs
       uses: actions/download-artifact@v4
@@ -28,6 +44,7 @@ jobs:
         name: doxygen
         github-token: ${{ secrets.BOT_CI_ISSUES }}
         repository: art-daq/otsdaq
+        run-id: ${{ steps.run_ids.outputs.otsdaq_id }}
 
     - name: Create index.html
       run: |
