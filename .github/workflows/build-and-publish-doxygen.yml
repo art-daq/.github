@@ -10,6 +10,8 @@ jobs:
     name: build_doxygen
     runs-on: ubuntu-latest
     
+    env:
+      GH_TOKEN: ${{ secrets.BOT_CI_ISSUES }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: SUID for tar
