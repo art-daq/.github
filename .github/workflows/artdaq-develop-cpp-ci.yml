@@ -115,11 +115,13 @@ jobs:
         echo "Collecting Doxygen"
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
         ls -d build/*/doc/html
+        set -x
         for dir in build/*/doc/html;do
-            pkg=`echo \$dir|sed 's|build/||;s|/doc/html||'`
-            echo "Copying \$dir to /scratch/art-daq/docs/\$pkg"
-            cp -a \$dir /scratch/art-daq/docs/\$pkg
+            thispkg=`echo \$dir|sed 's|build/||;s|/doc/html||'`
+            echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
+            cp -a \$dir /scratch/art-daq/docs/\$thispkg
         done
+        set +x
         echo "Contents of docs after collection"
         ls /scratch/art-daq/docs
 
