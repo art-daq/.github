@@ -73,9 +73,7 @@ jobs:
         cd /opt/artdaq
         source /opt/artdaq/setupARTDAQDEMO || exit 1
         
-        rm -rf spack-repos/scd_recipes/packages/perl-ipc-run3
-        spack add lcov
-        spack concretize --force --deprecated && spack install --deprecated
+        spack load lcov
                 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         export pkgname=\${REPO//_/-}
@@ -155,7 +153,8 @@ jobs:
     - name: upload coverage
       uses: actions/upload-artifact@main
       with:
-        name: doxygen
+        if-no-files-found: error
+        name: lcov
         path: ${{ github.workspace }}/scratch/art-daq/coverage
 
     - name: change dir permission again
