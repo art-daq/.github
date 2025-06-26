@@ -1,9 +1,12 @@
-name: Build artdaq suite against develop
+name: Create artdaq LCOV coverage report
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  workflow_call:
+  schedule:
+    - cron: "0 0 * * 4"
+
+  workflow_dispatch:
 
 jobs:
   build_against_dev_release:
