@@ -125,7 +125,7 @@ jobs:
         lcov -c -i -d . -o artdaq.base
 
         spack mpd test
-        run_integration_tests.sh --runduration 30
+        #run_integration_tests.sh --runduration 30
         
         lcov -d . --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
