@@ -113,7 +113,7 @@ jobs:
         export USE_GCOV=1
 
         echo "Starting build"
-        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
+        spack mpd build -G Ninja -j\$CETPKG_J --clean 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         
         echo "Spack install completed with status code \$res"
