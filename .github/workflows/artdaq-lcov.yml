@@ -122,14 +122,14 @@ jobs:
         
         echo "Collecting coverage data"
         lcov -d . --zerocounters
-        lcov -c -i -d . -o artdaq.base
+        lcov -c --ignore-errors mismatch --keep-going -i -d . -o artdaq.base
 
         spack mpd test
         #run_integration_tests.sh --runduration 30
         
-        lcov -d . --capture --output-file artdaq.info
+        lcov -d . --ignore-errors mismatch --keep-going --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
-        lcov --remove artdaq.total '/cvmfs/*' 'boost/*' '*/products/*' "*/build_${CET_SUBDIR}/*" '/usr/include/curl/*' --output-file artdaq.info.cleaned
+        lcov --remove artdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file artdaq.info.cleaned
         genhtml -o coverage artdaq.info.cleaned
 
         mv coverage /scratch/art-daq

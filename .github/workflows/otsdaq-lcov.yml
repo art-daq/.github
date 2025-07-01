@@ -112,7 +112,8 @@ jobs:
         export USE_GCOV=1
         
         echo "Starting build"
-        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
+        sed -i 's/RelWithDebInfo/Debug/g' srcs/CMakePresets.json
+        spack mpd build -G Ninja -j\$CETPKG_J --clean 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         
         echo "Spack install completed with status code \$res"
@@ -120,13 +121,13 @@ jobs:
         
         echo "Collecting coverage data"
         lcov -d . --zerocounters
-        lcov -c -i -d . -o otsdaq.base
+        lcov -c --ignore-errors mismatch --keep-going -i -d . -o otsdaq.base
 
         spack mpd test
         
-        lcov -d . --capture --output-file otsdaq.info
+        lcov -d . --ignore-errors mismatch --keep-going --capture --output-file otsdaq.info
         lcov -a otsdaq.base -a otsdaq.info --output-file otsdaq.total
-        lcov --remove otsdaq.total '/cvmfs/*' 'boost/*' '*/products/*' "*/build_${CET_SUBDIR}/*" '/usr/include/curl/*' --output-file otsdaq.info.cleaned
+        lcov --remove otsdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
         genhtml -o coverage otsdaq.info.cleaned
 
         mv coverage /scratch/art-daq
