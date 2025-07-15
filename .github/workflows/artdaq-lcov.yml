@@ -67,6 +67,7 @@ jobs:
       run: |
       
         cd $GITHUB_WORKSPACE/scratch
+        mkdir -p /scratch/art-daq
         cat << EOT > build_pkg.sh
         #!/bin/bash
         
@@ -106,13 +107,13 @@ jobs:
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
         
         echo "Collecting coverage data"
-        lcov -d srcs --zerocounters
-        lcov -c --ignore-errors mismatch --keep-going -i -d srcs -o artdaq.base
+        lcov -d build --zerocounters
+        lcov -c --ignore-errors mismatch --keep-going -i -d build -o artdaq.base
 
         spack mpd test
         #run_integration_tests.sh --runduration 30
         
-        lcov -d srcs --ignore-errors mismatch --keep-going --capture --output-file artdaq.info
+        lcov -d build --ignore-errors mismatch --keep-going --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
         lcov --remove artdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' 'artdaq-database/built-in/*' --output-file artdaq.info.cleaned
         genhtml -o coverage artdaq.info.cleaned
