@@ -31,14 +31,14 @@ jobs:
     - name: Checkout pkg
       uses: actions/checkout@main
       with:
-        repository: ${{ github.repository }}
-        path: scratch/${{ github.repository }}
+        repository: art-daq/otsdaq
+        path: scratch/otsdaq
         fetch-depth: 0
 
     - name: Fetch package version
       id: version
       run: |
-        cd $GITHUB_WORKSPACE/scratch/${{ github.repository }}
+        cd $GITHUB_WORKSPACE/scratch/otsdaq
         tag=`git describe --tags --abbrev=0`
         echo "Using tag $tag"
         echo "tag=${tag}" >>$GITHUB_OUTPUT
@@ -74,23 +74,8 @@ jobs:
         source /opt/otsdaq/setup_ots.sh || exit 1
         
         spack load lcov
-
-        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        export pkgname=\${REPO//_/-}
-        echo "Copying /scratch/art-daq/\$REPO to srcs \$pkgname"
-        cd srcs
-        if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
-        cp -pr /scratch/art-daq/\$REPO \$pkgname
-        cd \$pkgname
-        git config --global --add safe.directory \$PWD
-        export ref=\$(git describe --all)
-        echo "Described current ref as \${ref}"
+        
         branch=develop
-
-        if [[ "x\${ref}" =~ "xheads/" ]]; then
-            echo "Setting branch to \${ref//heads\//}"
-            branch=\${ref//heads\//}
-        fi
 
         echo "Checking out \$branch"
         cd  /opt/otsdaq/srcs
