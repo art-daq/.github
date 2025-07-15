@@ -120,12 +120,12 @@ jobs:
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
         
         echo "Collecting coverage data"
-        lcov -d . --zerocounters
-        lcov -c --ignore-errors mismatch --keep-going -i -d . -o otsdaq.base
+        lcov -d srcs --zerocounters
+        lcov -c --ignore-errors mismatch --keep-going -i -d srcs -o otsdaq.base
 
         spack mpd test
         
-        lcov -d . --ignore-errors mismatch --keep-going --capture --output-file otsdaq.info
+        lcov -d srcs --ignore-errors mismatch --keep-going --capture --output-file otsdaq.info
         lcov -a otsdaq.base -a otsdaq.info --output-file otsdaq.total
         lcov --remove otsdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
         genhtml -o coverage otsdaq.info.cleaned
