@@ -155,7 +155,7 @@ jobs:
       uses: actions/upload-artifact@main
       with:
         if-no-files-found: error
-        name: lcov
+        name: artdaq_code_coverage
         path: ${{ github.workspace }}/scratch/art-daq/coverage
 
     - name: change dir permission again
