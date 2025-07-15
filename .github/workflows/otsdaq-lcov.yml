@@ -106,13 +106,13 @@ jobs:
         
         echo "Collecting coverage data"
         lcov -d build --zerocounters
-        lcov -c --ignore-errors mismatch --keep-going -i -d build -o otsdaq.base
+        lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --keep-going -i -d build -o otsdaq.base
 
         spack mpd test
         
-        lcov -d build --ignore-errors mismatch --keep-going --capture --output-file otsdaq.info
+        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --capture --output-file otsdaq.info
         lcov -a otsdaq.base -a otsdaq.info --output-file otsdaq.total
-        lcov --remove otsdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
+        lcov --remove otsdaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
         genhtml -o coverage otsdaq.info.cleaned
 
         mv coverage /scratch/art-daq

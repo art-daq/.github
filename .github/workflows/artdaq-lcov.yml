@@ -96,6 +96,7 @@ jobs:
 
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         export USE_GCOV=1
+        export RUN_TESTS=1 # Run artdaq-database tests
 
         echo "Starting build"
         sed -i 's/RelWithDebInfo/Debug/g' srcs/CMakePresets.json
@@ -107,14 +108,14 @@ jobs:
         
         echo "Collecting coverage data"
         lcov -d build --zerocounters
-        lcov -c --ignore-errors mismatch --keep-going -i -d build -o artdaq.base
+        lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov -i -d build -o artdaq.base
 
         spack mpd test
         #run_integration_tests.sh --runduration 30
         
-        lcov -d build --ignore-errors mismatch --keep-going --capture --output-file artdaq.info
+        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
-        lcov --remove artdaq.total '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' 'artdaq-database/built-in/*' --output-file artdaq.info.cleaned
+        lcov --remove artdaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' 'artdaq-database/built-in/*' --output-file artdaq.info.cleaned
         genhtml -o coverage artdaq.info.cleaned
 
         mv coverage /scratch/art-daq
