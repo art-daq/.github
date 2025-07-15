@@ -32,13 +32,13 @@ jobs:
       uses: actions/checkout@main
       with:
         repository: art-daq/artdaq
-        path: scratch/artdaq
+        path: scratch/art-daq/artdaq
         fetch-depth: 0
 
     - name: Fetch package version
       id: version
       run: |
-        cd $GITHUB_WORKSPACE/scratch/artdaq
+        cd $GITHUB_WORKSPACE/scratch/art-daq/artdaq
         tag=`git describe --tags --abbrev=0`
         echo "Using tag $tag"
         echo "tag=${tag}" >>$GITHUB_OUTPUT
@@ -67,7 +67,6 @@ jobs:
       run: |
       
         cd $GITHUB_WORKSPACE/scratch
-        mkdir -p /scratch/art-daq
         cat << EOT > build_pkg.sh
         #!/bin/bash
         
