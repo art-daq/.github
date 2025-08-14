@@ -113,7 +113,7 @@ jobs:
         spack mpd test
         #run_integration_tests.sh --runduration 30
         
-        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --capture --output-file artdaq.info
+        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --ignore-errors negative,negative --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
         lcov --remove artdaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' 'artdaq-database/built-in/*' --output-file artdaq.info.cleaned
         genhtml -o coverage artdaq.info.cleaned
