@@ -105,6 +105,9 @@ jobs:
         spack config add config:mpd_user_dir:/opt/otsdaq/spack-repos/mpd/
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         
+        # Cleanup old docs
+        rm -rf build/*/doc
+        
         echo "Starting build"
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific

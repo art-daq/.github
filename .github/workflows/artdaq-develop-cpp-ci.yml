@@ -104,6 +104,9 @@ jobs:
         cd /opt/artdaq
         spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
 
+        # Cleanup old docs
+        rm -rf build/*/doc
+        
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         echo "Starting build"
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
