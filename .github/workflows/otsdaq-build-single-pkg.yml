@@ -12,7 +12,22 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Delete huge unnecessary tools folder
-      run: rm -rf /opt/hostedtoolcache
+      if: runner.os == 'Linux'
+      run: |
+        # Space usage before cleanup
+        df -h /
+ 
+        # Remove unused tool caches (comment any required ones with #)
+        sudo rm -rf /usr/lib/jvm
+        sudo rm -rf /usr/local/.ghcup
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/local/share/powershell
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/share/swift
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+ 
+        # Verify gains
+        df -h /
 
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
