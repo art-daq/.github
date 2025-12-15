@@ -105,13 +105,9 @@ jobs:
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
         
-        echo "ls of /scratch/art-daq/build_\$REPO"
-        ls /scratch/art-daq/build_\$REPO
-        echo
-
-        echo "ls of /scratch/art-daq/build_\$REPO/Testing/Temporary"
-        ls /scratch/art-daq/build_\$REPO/Testing/Temporary
-        echo
+        echo "Copying testing logs"
+        mkdir -p /scratch/art-daq/Testing
+        cp /scratch/art-daq/build_\$REPO/Testing/Temporary/*.log /scratch/art-daq/Testing
 
         exit \$res
         EOT
@@ -125,11 +121,20 @@ jobs:
         grep "No tests were found!!!" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
+      if: always()
       uses: actions/upload-artifact@main
       with:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
+    - name: Upload testing log file(s)
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: test_logs
+        path: ${{ github.workspace }}/scratch/art-daq/Testing
+
     - name: change dir permission again
+      if: always()
       run: |
         sudo chmod -R 777 /var/lib/cvmfs
