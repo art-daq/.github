@@ -105,6 +105,9 @@ jobs:
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
         
+        ls /scratch/art-daq/build_\$REPO
+        ls /scratch/art-daq/build_\$REPO/test
+
         exit \$res
         EOT
         chmod +x build_pkg.sh
