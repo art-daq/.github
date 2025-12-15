@@ -146,6 +146,7 @@ jobs:
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
+      if: always()
       uses: actions/upload-artifact@main
       with:
         if-no-files-found: error
@@ -160,5 +161,6 @@ jobs:
         path: ${{ github.workspace }}/scratch/art-daq/coverage
 
     - name: change dir permission again
+      if: always()
       run: |
         sudo chmod -R 777 /var/lib/cvmfs

@@ -151,17 +151,20 @@ jobs:
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
+      if: always()
       uses: actions/upload-artifact@main
       with:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload Doxygen docs
+      if: always()
       uses: actions/upload-artifact@main
       with:
         name: doxygen
         path: ${{ github.workspace }}/scratch/art-daq/docs
 
     - name: change dir permission again
+      if: always()
       run: |
         sudo chmod -R 777 /var/lib/cvmfs
