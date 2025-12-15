@@ -105,8 +105,13 @@ jobs:
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
         
+        echo "ls of /scratch/art-daq/build_\$REPO"
         ls /scratch/art-daq/build_\$REPO
-        ls /scratch/art-daq/build_\$REPO/test
+        echo
+
+        echo "ls of /scratch/art-daq/build_\$REPO/Testing/Temporary"
+        ls /scratch/art-daq/build_\$REPO/Testing/Temporary
+        echo
 
         exit \$res
         EOT
