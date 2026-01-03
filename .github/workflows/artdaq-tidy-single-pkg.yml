@@ -103,7 +103,7 @@ jobs:
         #!/bin/bash
         
         cd /opt/artdaq
-        source /opt/artdaq/setup_artdaq_rte.sh || exit 1
+        source /opt/artdaq/setupARTDAQDEMO || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         names="$names"
