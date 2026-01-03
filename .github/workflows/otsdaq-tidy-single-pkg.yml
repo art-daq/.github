@@ -103,7 +103,7 @@ jobs:
         #!/bin/bash
         
         cd /opt/otsdaq
-        source /opt/otsdaq/setup_ots.sh || exit 1
+        source /opt/otsdaq/setup_ots_rte.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         names="$names"
