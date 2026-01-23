@@ -41,6 +41,7 @@ jobs:
           fi
         done
         while read entry;do
+          if [ "x\$entry" == "x" ]; then continue; fi
           if [ -d \$entry ] || [ -f \$entry ]; then
             exclude_regex="\${exclude_regex}|\$entry"
           fi
