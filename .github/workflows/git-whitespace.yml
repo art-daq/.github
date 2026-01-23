@@ -40,12 +40,14 @@ jobs:
             exclude_regex="\${exclude_regex}|\$dir"
           fi
         done
-        while read entry;do
-          if [ "x\$entry" == "x" ]; then continue; fi
-          if [ -d \$entry ] || [ -f \$entry ]; then
-            exclude_regex="\${exclude_regex}|\$entry"
-          fi
-        done < .git_whitespace_exclude            
+        if [ -f .git_whitespace_exclude ];then
+          while read entry;do
+            if [ "x\$entry" == "x" ]; then continue; fi
+            if [ -d \$entry ] || [ -f \$entry ]; then
+              exclude_regex="\${exclude_regex}|\$entry"
+            fi
+          done < .git_whitespace_exclude
+        fi
         exclude_regex="\${exclude_regex})"
         echo "Excluding files from checks via \${exclude_regex}"
 
