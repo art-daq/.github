@@ -36,7 +36,7 @@ jobs:
         exclude_regex="^(nothingtoseehere"
 
         for dir in \$excluded_dirs;do 
-          if [ -d \$dir ]; then
+          if [ -d \$dir ] || [ -f \$dir ]; then
             exclude_regex="\${exclude_regex}|\$dir"
           fi
         done
