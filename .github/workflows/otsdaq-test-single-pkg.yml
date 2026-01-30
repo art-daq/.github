@@ -8,7 +8,7 @@ jobs:
   build_single_pkg:
     name: build single pkg
     runs-on: ubuntu-latest
-    
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Delete huge unnecessary tools folder
@@ -16,7 +16,7 @@ jobs:
       run: |
         # Space usage before cleanup
         df -h /
- 
+
         # Remove unused tool caches (comment any required ones with #)
         sudo rm -rf /usr/lib/jvm
         sudo rm -rf /usr/local/.ghcup
@@ -25,7 +25,7 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /usr/share/swift
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
- 
+
         # Verify gains
         df -h /
 
@@ -37,7 +37,7 @@ jobs:
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
-    
+
     - name: Checkout pkg
       uses: actions/checkout@main
       with:
@@ -75,18 +75,18 @@ jobs:
 
     - name: run build in docker container with cvmfs bind mount
       run: |
-      
+
         cd $GITHUB_WORKSPACE/scratch
         cat << EOT > build_pkg.sh
         #!/bin/bash
-        
+
         cd /opt/otsdaq
         source /opt/otsdaq/setup_ots_rte.sh || exit 1
-        
+
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
-        
+
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
         echo "Compiler is \$compiler"
@@ -97,13 +97,13 @@ jobs:
         echo "Compiling code"
         make -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
-        
+
         if [ \$res -eq 0 ]; then
             echo "Starting tests"
             make test 2>&1 | tee -a /scratch/art-daq/build.log
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
-        
+
         echo "Copying testing logs"
         mkdir -p /scratch/art-daq/Testing
         cp /scratch/art-daq/build_\$REPO/Testing/Temporary/*.log /scratch/art-daq/Testing
@@ -113,7 +113,7 @@ jobs:
         chmod +x build_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/otsdaq-spack:latest /scratch/build_pkg.sh
-        
+
     - name: Check build log for success
       run: |
         grep "100% tests passed, 0 tests failed" ${{ github.workspace }}/scratch/art-daq/build.log ||
