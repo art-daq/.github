@@ -35,11 +35,19 @@ jobs:
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
-        for dir in \$excluded_dirs;do
-          if [ -d \$dir ]; then
+        for dir in \$excluded_dirs;do 
+          if [ -d \$dir ] || [ -f \$dir ]; then
             exclude_regex="\${exclude_regex}|\$dir"
           fi
         done
+        if [ -f .git_whitespace_exclude ];then
+          while read entry;do
+            if [ "x\$entry" == "x" ]; then continue; fi
+            if [ -d \$entry ] || [ -f \$entry ]; then
+              exclude_regex="\${exclude_regex}|\$entry"
+            fi
+          done < .git_whitespace_exclude
+        fi
         exclude_regex="\${exclude_regex})"
         echo "Excluding files from checks via \${exclude_regex}"
 
@@ -72,7 +80,9 @@ jobs:
             if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
                || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl" \
-               || "\$name" =~ "CMakeLists.txt" || "\$ext" == "yml" ]]; then
+               || "\$name" =~ "CMakeLists.txt" || "\$ext" == "yml" \
+               || "\$ext" == "html" || "\$ext" == "htm" || "\$ext" == "js" || "\$ext" == "css" \
+               ]]; then
 
                 # check whitespace and return non-zero if not allowed
 
