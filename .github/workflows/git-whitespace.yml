@@ -80,7 +80,7 @@ jobs:
             if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
                || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl" \
-               || "\$name" =~ "CMakeLists.txt" || "\$ext" == "yml" \
+               || "\$name" =~ "CMakeLists.txt" || "\$ext" == "yml" || "\$ext" == "yaml" \
                || "\$ext" == "html" || "\$ext" == "htm" || "\$ext" == "js" || "\$ext" == "css" \
                ]]; then
 
