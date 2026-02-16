@@ -156,7 +156,7 @@ jobs:
     - name: Check build log for py-black success
       if: always()
       run: |
-        grep "py-black completed with status code 0." ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "py-black completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
