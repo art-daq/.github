@@ -128,19 +128,31 @@ jobs:
             fi
         done
 
-        echo "Running clang-format on changed files"
-        clang-format -n -Werror \$files  2>&1 | tee -a /scratch/art-daq/build.log
-        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        if [ "x\$files" != "x" ]; then
+            echo "Running clang-format on changed files"
+            clang-format -n -Werror \$files  2>&1 | tee -a /scratch/art-daq/build.log
+            res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
-        echo "Clang-format completed with status code \$res"
-        echo "Clang-format completed with status code \$res" >>/scratch/art-daq/build.log
+            echo "Clang-format completed with status code \$res"
+            echo "Clang-format completed with status code \$res" >>/scratch/art-daq/build.log
+        else
+            echo "No changed clang-format files"
+            echo "No changed clang-format files" >>/scratch/art-daq/build.log
+            res=0
+        fi
 
-        echo "Running black on changed python files"
-        black --check \$pyfiles 2>&1 | tee -a /scratch/art-daq/build.log
-        res_py=\${PIPESTATUS[0]} # Get result of first command
+        if [ "x\$pyfiles" == "x" ]; then
+            echo "Running black on changed python files"
+            black --check \$pyfiles 2>&1 | tee -a /scratch/art-daq/build.log
+            res_py=\${PIPESTATUS[0]} # Get result of first command
 
-        echo "py-black completed with status code \$res_py"
-        echo "py-black completed with status code \$res_py" >>/scratch/art-daq/build.log
+            echo "py-black completed with status code \$res_py"
+            echo "py-black completed with status code \$res_py" >>/scratch/art-daq/build.log
+        else
+            echo "No changed python files"
+            echo "No changed python files" >>/scratch/art-daq/build.log
+            res_py=0
+        fi
 
         exit \$(( \$res + \$res_py ))
         EOT
@@ -152,12 +164,13 @@ jobs:
     - name: Check build log for clang-format success
       run: |
         grep "Clang-format completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No changed clang-format files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: Check build log for py-black success
-      if: always()
       run: |
         grep "py-black completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No changed python files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
