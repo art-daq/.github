@@ -140,7 +140,7 @@ jobs:
             res=0
         fi
 
-        if [ "x\$pyfiles" == "x" ]; then
+        if [ "x\$pyfiles" != "x" ]; then
             echo "Running black on changed python files"
             black --check \$pyfiles 2>&1 | tee -a /scratch/art-daq/build.log
             res_py=\${PIPESTATUS[0]} # Get result of first command
