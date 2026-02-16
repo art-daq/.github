@@ -158,7 +158,7 @@ jobs:
         chmod +x build_pkg.sh
         cat build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/otsdaq-spack:latest /scratch/build_pkg.sh
 
     - name: Check build log for clang-format success
       run: |
