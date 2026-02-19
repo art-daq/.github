@@ -6,6 +6,9 @@ on:
         against-ref:
             required: false
             type: string
+        exclude-directories:
+            required: false
+            type: string
 
 jobs:
 
@@ -82,55 +85,68 @@ jobs:
 
         cd $GITHUB_WORKSPACE/scratch
 
-        against=${{ inputs.against-ref }}
-        if [ "x$against" == "x" ] || [ "x$against" == "x0" ]; then
-            against=$(git hash-object -t tree /dev/null)
-        fi
-        echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
-        cd ${{ github.repository }}
-        names=$( git diff --cached --name-only --diff-filter=AM  $against )
-
-        if [ "x$names" == "x" ]; then
-            echo "No changed files"
-            echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
-            exit 0
-        fi
-        echo "Changed files to format: $names"
-
-        cd $GITHUB_WORKSPACE/scratch
-
-        cat << EOT > build_pkg.sh
+        cat << EOT > format_pkg.sh
         #!/bin/bash
-
-        cd /opt/artdaq
-        source /opt/artdaq/setup-env.sh || exit 1
-
-        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        names="$names"
 
         cd /scratch/${{ github.repository }}
 
+        excluded_dirs="${{ inputs.exclude-directories }}"
+        exclude_regex="^(nothingtoseehere"
+
+        for dir in \$excluded_dirs;do
+          if [ -d \$dir ] || [ -f \$dir ]; then
+            exclude_regex="\${exclude_regex}|\$dir"
+          fi
+        done
+        if [ -f .git_whitespace_exclude ];then
+          while read entry;do
+            if [ "x\$entry" == "x" ]; then continue; fi
+            if [ -d \$entry ] || [ -f \$entry ]; then
+              exclude_regex="\${exclude_regex}|\$entry"
+            fi
+          done < .git_whitespace_exclude
+        fi
+        exclude_regex="\${exclude_regex})"
+        echo "Excluding files from checks via \${exclude_regex}"
+
+        against=${{ inputs.against-ref }}
+        if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
+            against=\$(git hash-object -t tree /dev/null)
+        fi
+        echo "Checking for formatting issues introduced since commit \$against"
+        names=$( git diff --cached --name-only --diff-filter=AM  $against | grep -vE "${exclude_regex}" )
+
+        if [ "x$names" == "x" ]; then
+            echo "No changed files"
+            exit 0
+        fi
+
+        # Setup Spack environment and load required packages
+        source /opt/artdaq/setup-env.sh || exit 1
         spack load --first llvm
         spack load --first py-black
 
-        files=""
-        pyfiles=""
+        files=()
+        pyfiles=()
+        IFS_SAVE=\$IFS
+        IFS=\$'\\n'
         for name in \$names;do
             bname=\$( basename \$name )
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
             if [[ "\$ext" == "hh" || "\$ext" == "cc" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
                ]]; then
-               files="\$files \$name"
+               files+=("\$name")
             fi
             if [[ "\$ext" == "py" ]]; then
-               pyfiles="\$pyfiles \$name"
+               pyfiles+=("\$name")
             fi
         done
+        IFS=\$IFS_SAVE
 
-        if [ "x\$files" != "x" ]; then
+        if [ \${#files[@]} -gt 0 ]; then
             echo "Running clang-format on changed files"
-            clang-format -n -Werror \$files  2>&1 | tee -a /scratch/art-daq/build.log
+            clang-format -n -Werror "\${files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
             echo "Clang-format completed with status code \$res"
@@ -141,9 +157,9 @@ jobs:
             res=0
         fi
 
-        if [ "x\$pyfiles" != "x" ]; then
+        if [ \${#pyfiles[@]} -gt 0 ]; then
             echo "Running black on changed python files"
-            black --check \$pyfiles 2>&1 | tee -a /scratch/art-daq/build.log
+            black --check "\${pyfiles[@]}" 2>&1 | tee -a /scratch/art-daq/build.log
             res_py=\${PIPESTATUS[0]} # Get result of first command
 
             echo "py-black completed with status code \$res_py"
@@ -156,10 +172,10 @@ jobs:
 
         exit \$(( \$res + \$res_py ))
         EOT
-        chmod +x build_pkg.sh
-        cat build_pkg.sh
+        chmod +x format_pkg.sh
+        cat format_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/format_pkg.sh
 
     - name: Check build log for clang-format success
       run: |
