@@ -114,7 +114,13 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Checking for formatting issues introduced since commit \$against"
-        names=\$( git diff --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
+        names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
+
+        if [ $? -ne 0 ]; then
+            echo "Error running git diff command"
+            echo "Error running git diff command" >>/scratch/art-daq/build.log
+            exit 1
+        fi
 
         if [ "x\$names" == "x" ]; then
             echo "No changed files"
