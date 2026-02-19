@@ -60,8 +60,8 @@ jobs:
         # Cross platform projects tend to avoid non-ASCII filenames; prevent
         # them from being added to the repository. We exploit the fact that the
         # printable range starts at the space character and ends with tilde.
-        badchar=\$(git diff --cached --name-only --diff-filter=A  \$against | grep -vE "\${exclude_regex}" | \
-        LC_ALL=C tr -d 'A-Za-z0-9/\n_.@+-' | wc -c)
+        badchar=\$(git diff --cached -z --name-only --diff-filter=A  \$against | grep -z -vE "\${exclude_regex}" | \
+        tr '\0' '\n' | LC_ALL=C tr -d 'A-Za-z0-9/\n_.@+-' | wc -c)
         if [ \$badchar != 0 ]
         then
             echo "Check failed: cannot add a file name with non-ASCII or blank char."
@@ -69,13 +69,13 @@ jobs:
         fi
 
 
-        names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
+        names=\$( git diff --cached -z --name-only --diff-filter=AM  \$against | grep -z -vE "\${exclude_regex}" | tr '\0' '\n' )
 
         rc=0
-        for name in \$names
+        while IFS= read -r name
         do
             #echo "Checking whitespace for \$name"
-            bname=\$( basename \$name )
+            bname=\$( basename "\$name" )
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
             if [[ "\$ext" == "hh" || "\$ext" == "cc" || "\$ext" == "fcl" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
@@ -86,7 +86,7 @@ jobs:
 
                 # check whitespace and return non-zero if not allowed
 
-                git diff-index --check --cached \$against \$name
+                git diff-index --check --cached \$against -- "\$name"
                 [ \$? -ne 0 ] && rc=1
 
                 if [[ -e "\$name" && \$(tail -c1 "\$name" | wc -l) -eq 0 ]]; then
@@ -94,7 +94,7 @@ jobs:
                     rc=1
                 fi
             fi
-        done
+        done <<< "\$names"
 
         if [ \$rc -ne 0 ] ; then
             echo "Github CI detected format errors!"

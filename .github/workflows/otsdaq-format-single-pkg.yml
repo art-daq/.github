@@ -87,14 +87,15 @@ jobs:
         fi
         echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
         cd ${{ github.repository }}
-        names=$( git diff --cached --name-only --diff-filter=AM  $against )
+        git diff --cached -z --name-only --diff-filter=AM $against > $GITHUB_WORKSPACE/scratch/changed_files.txt
 
-        if [ "x$names" == "x" ]; then
+        if [ ! -s $GITHUB_WORKSPACE/scratch/changed_files.txt ]; then
             echo "No changed files"
             echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
             exit 0
         fi
-        echo "Changed files to format: $names"
+        echo "Changed files to format:"
+        tr '\0' '\n' < $GITHUB_WORKSPACE/scratch/changed_files.txt
 
         cd $GITHUB_WORKSPACE/scratch
 
@@ -105,31 +106,30 @@ jobs:
         source /opt/otsdaq/setup-env.sh || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        names="$names"
 
         cd /scratch/${{ github.repository }}
 
         spack load --first llvm
         spack load --first py-black
 
-        files=""
-        pyfiles=""
-        for name in \$names;do
-            bname=\$( basename \$name )
+        files=()
+        pyfiles=()
+        while IFS= read -r -d '' name; do
+            bname=\$( basename "\$name" )
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
             if [[ "\$ext" == "hh" || "\$ext" == "cc" \
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
                ]]; then
-               files="\$files \$name"
+               files+=("\$name")
             fi
             if [[ "\$ext" == "py" ]]; then
-               pyfiles="\$pyfiles \$name"
+               pyfiles+=("\$name")
             fi
-        done
+        done < /scratch/changed_files.txt
 
-        if [ "x\$files" != "x" ]; then
+        if [ \${#files[@]} -gt 0 ]; then
             echo "Running clang-format on changed files"
-            clang-format -n -Werror \$files  2>&1 | tee -a /scratch/art-daq/build.log
+            clang-format -n -Werror "\${files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
             echo "Clang-format completed with status code \$res"
@@ -140,9 +140,9 @@ jobs:
             res=0
         fi
 
-        if [ "x\$pyfiles" != "x" ]; then
+        if [ \${#pyfiles[@]} -gt 0 ]; then
             echo "Running black on changed python files"
-            black --check \$pyfiles 2>&1 | tee -a /scratch/art-daq/build.log
+            black --check "\${pyfiles[@]}" 2>&1 | tee -a /scratch/art-daq/build.log
             res_py=\${PIPESTATUS[0]} # Get result of first command
 
             echo "py-black completed with status code \$res_py"
