@@ -86,18 +86,6 @@ jobs:
             against=$(git hash-object -t tree /dev/null)
         fi
         echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
-        cd ${{ github.repository }}
-        git diff --cached -z --name-only --diff-filter=AM $against > $GITHUB_WORKSPACE/scratch/changed_files.txt
-
-        if [ ! -s $GITHUB_WORKSPACE/scratch/changed_files.txt ]; then
-            echo "No changed files"
-            echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
-            exit 0
-        fi
-        echo "Changed files to format:"
-        tr '\0' '\n' < $GITHUB_WORKSPACE/scratch/changed_files.txt
-
-        cd $GITHUB_WORKSPACE/scratch
 
         cat << EOT > build_pkg.sh
         #!/bin/bash
@@ -125,7 +113,13 @@ jobs:
             if [[ "\$ext" == "py" ]]; then
                pyfiles+=("\$name")
             fi
-        done < /scratch/changed_files.txt
+        done < <(git diff --cached -z --name-only --diff-filter=AM $against)
+
+        if [ \${#files[@]} -eq 0 ] && [ \${#pyfiles[@]} -eq 0 ]; then
+            echo "No changed files"
+            echo "No changed files" >/scratch/art-daq/build.log
+            exit 0
+        fi
 
         if [ \${#files[@]} -gt 0 ]; then
             echo "Running clang-format on changed files"
