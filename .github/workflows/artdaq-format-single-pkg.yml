@@ -89,8 +89,6 @@ jobs:
         #!/bin/bash
 
         cd /scratch/${{ github.repository }}
-        pwd
-        ls -la
 
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
@@ -116,6 +114,8 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Checking for formatting issues introduced since commit \$against"
+        git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}"
+        echo git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}"
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
 
         if [ \$? -ne 0 ]; then
