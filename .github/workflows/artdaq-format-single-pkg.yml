@@ -115,11 +115,7 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Checking for formatting issues introduced since commit \$against"
-
-        pwd
-        ls -la
-        echo git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}"
-        git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}"
+        
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
 
         if [ \$? -ne 0 ]; then
