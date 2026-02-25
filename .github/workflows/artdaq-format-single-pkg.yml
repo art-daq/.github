@@ -139,16 +139,20 @@ jobs:
         spack load --first py-black
 
         files=()
+        header_files=()
         pyfiles=()
         IFS_SAVE=\$IFS
         IFS=\$'\\n'
         for name in \$names;do
             bname=\$( basename \$name )
             ext=\$(echo \$bname | awk -F. '{if(NF==1) print ""; else print \$NF};' )
-            if [[ "\$ext" == "hh" || "\$ext" == "cc" \
-               || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc"  || "\$ext" == "cpp" \
+            if [[ "\$ext" == "cc" || "\$ext" == "C"  || "\$ext" == "cpp" || "\$ext" == "icc" \
                ]]; then
                files+=("\$name")
+            fi
+            if [[ "\$ext" == "hh" || "\$ext" == "h"  || "\$ext" == "hxx"  || "\$ext" == "hpp"  \
+               ]]; then
+               header_files+=("\$name")
             fi
             if [[ "\$ext" == "py" ]]; then
                pyfiles+=("\$name")
@@ -166,6 +170,23 @@ jobs:
         else
             echo "No changed clang-format files"
             echo "No changed clang-format files" >>/scratch/art-daq/build.log
+            res=0
+        fi
+
+        if [ \${#header_files[@]} -gt 0 ]; then
+            echo "Running clang-format on changed header files"
+            header_arg=""
+            if [ -f .clang-format-hpp ]; then
+                header_arg="--style=file:.clang-format-hpp"
+            fi
+            clang-format \$header_arg -n -Werror "\${files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
+            res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+
+            echo "Clang-format headers completed with status code \$res"
+            echo "Clang-format headers completed with status code \$res" >>/scratch/art-daq/build.log
+        else
+            echo "No changed clang-format header files"
+            echo "No changed clang-format header files" >>/scratch/art-daq/build.log
             res=0
         fi
 
@@ -192,6 +213,12 @@ jobs:
       run: |
         grep "Clang-format completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed clang-format files" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
+
+    - name: Check build log for clang-format header success
+      run: |
+        grep "Clang-format headers completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No changed clang-format header files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: Check build log for py-black success
