@@ -1,5 +1,8 @@
 name: "Check whitespace using Git"
 
+permissions:
+  contents: read
+
 on:
   workflow_call:
     inputs:
