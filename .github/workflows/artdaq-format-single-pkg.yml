@@ -179,7 +179,7 @@ jobs:
             if [ -f .clang-format-hpp ]; then
                 header_arg="--style=file:.clang-format-hpp"
             fi
-            clang-format \$header_arg -n -Werror "\${files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
+            clang-format \$header_arg -n -Werror "\${header_files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
             echo "Clang-format headers completed with status code \$res"
