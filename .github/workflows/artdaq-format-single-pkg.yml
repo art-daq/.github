@@ -160,6 +160,11 @@ jobs:
         done
         IFS=\$IFS_SAVE
 
+        echo "Found \${#files[@]} changed source files, \${#header_files[@]} changed header files, and \${#pyfiles[@]} changed python files"
+        echo "Source files: \${files[@]}"
+        echo "Header files: \${header_files[@]}"
+        echo "Python files: \${pyfiles[@]}"
+
         if [ \${#files[@]} -gt 0 ]; then
             echo "Running clang-format on changed files"
             clang-format -n -Werror "\${files[@]}"  2>&1 | tee -a /scratch/art-daq/build.log
