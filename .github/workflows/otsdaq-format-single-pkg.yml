@@ -209,7 +209,6 @@ jobs:
         exit \$(( \$res + \$res_py ))
         EOT
         chmod +x format_pkg.sh
-        cat format_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/otsdaq-spack:latest /scratch/format_pkg.sh
 
