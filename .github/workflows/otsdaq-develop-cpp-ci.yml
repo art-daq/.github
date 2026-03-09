@@ -130,6 +130,12 @@ jobs:
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
+        if [ \$res -eq 0 ]; then
+          cd build
+          ninja install 2>&1 | tee -a /scratch/Mu2e/build.log
+          res=\${PIPESTATUS[0]}
+        fi
+
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
 
