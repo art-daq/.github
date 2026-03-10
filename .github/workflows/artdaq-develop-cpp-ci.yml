@@ -134,6 +134,7 @@ jobs:
           cd build
           ninja install 2>&1 | tee -a /scratch/Mu2e/build.log
           res=\${PIPESTATUS[0]}
+          cd ..
         fi
 
         echo "Spack install completed with status code \$res"
@@ -141,7 +142,7 @@ jobs:
 
         echo "Collecting Doxygen"
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
-        for dir in build/*/doc/html;do
+        for dir in /opt/artdaq/build/*/doc/html;do
             thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
             echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
             cp -a \$dir /scratch/art-daq/docs/\$thispkg
