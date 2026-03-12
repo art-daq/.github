@@ -143,7 +143,7 @@ jobs:
         echo "Collecting Doxygen"
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
         for dir in /opt/otsdaq/build/*/doc/html;do
-            thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
+            thispkg=\`echo \$dir|sed 's|/opt/otsdaq/build/||;s|/doc/html||'\`
             echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
             cp -a \$dir /scratch/art-daq/docs/\$thispkg
         done
