@@ -214,20 +214,14 @@ jobs:
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/format_pkg.sh
 
-    - name: Check build log for clang-format success
-      run: |
         grep "Clang-format completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed clang-format files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
-    - name: Check build log for clang-format header success
-      run: |
         grep "Clang-format headers completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed clang-format header files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
 
-    - name: Check build log for py-black success
-      run: |
         grep "py-black completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed python files" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log

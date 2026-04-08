@@ -126,8 +126,6 @@ jobs:
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
 
-    - name: Check build log for success
-      run: |
         grep "100% tests passed, 0 tests failed" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No tests were found!!!" ${{ github.workspace }}/scratch/art-daq/build.log
 
