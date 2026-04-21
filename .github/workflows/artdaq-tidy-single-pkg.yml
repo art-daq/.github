@@ -124,7 +124,7 @@ jobs:
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
         echo "Running clang-tidy on changed files"
-        run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/art-daq/build.log
+        run-clang-tidy -quiet -warnings-as-errors * \$names  2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         echo "Clang-tidy completed with status code \$res"
