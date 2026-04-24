@@ -121,7 +121,7 @@ jobs:
 
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
 
-        if [ \$? -ne 0 ]; then
+        if [ \${PIPESTATUS[0]} -ne 0 ]; then
             echo "Error running git diff command"
             echo "Error running git diff command" >>/scratch/art-daq/build.log
             exit 1
