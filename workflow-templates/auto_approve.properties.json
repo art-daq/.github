@@ -1,4 +1,0 @@
-{
-    "name": "Add an approval to a pull request",
-    "description": "Adding a dummy approval to a pull request, taking an input of PR number in the repo."
-}
