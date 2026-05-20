@@ -40,14 +40,14 @@ jobs:
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
 
-    - uses: cvmfs-contrib/github-action-cvmfs@v5
+    - uses: cvmfs-contrib/github-action-cvmfs@10197e000cc0add8e54ac4fb73d3ed44e2de72b4
 
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
 
     - name: Checkout pkg
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       with:
         repository: art-daq/artdaq
         path: scratch/art-daq/artdaq
@@ -68,7 +68,7 @@ jobs:
 
     - name: Cache cvmfs cache
       id: cvmfs_cache
-      uses: actions/cache@v5
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
       with:
         path: /var/lib/cvmfs/shared
         key: cachecvmfs-${{ steps.version.outputs.tag }}
@@ -148,14 +148,14 @@ jobs:
 
     - name: upload build log file
       if: always()
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         if-no-files-found: error
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload coverage
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         if-no-files-found: error
         name: artdaq_code_coverage
