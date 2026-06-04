@@ -42,7 +42,7 @@ jobs:
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
 
-    - uses: cvmfs-contrib/github-action-cvmfs@de31d817c76eae44c7c2deeb16af5fb85d080ce4
+    - uses: cvmfs-contrib/github-action-cvmfs@d93d881391926e8146776c13345c3e23d6393acd
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
