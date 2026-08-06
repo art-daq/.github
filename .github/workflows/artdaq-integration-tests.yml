@@ -14,6 +14,34 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    permissions:
+      packages: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - demo
+          - ascii_simulator_example
+          - circular_buffer_mode_example
+          - circular_buffer_mode_withRM
+          - complex_subsystems
+          - complicated_subsystems
+          - config_includes
+          - demo_largesystem
+          - eventbuilder_diskwriting
+          - file_closing_example
+          - mediumsystem_with_routing_manager
+          - mu2e_sample_system
+          - mu2e_stm_config
+          - multiple_art_processes_example
+          - multiple_dataloggers
+          - multiple_fragment_ids
+          - request_based_dataflow_example
+          - routing_manager_example
+          - simple_subsystems
+          - subrun_example
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Delete huge unnecessary tools folder
@@ -88,24 +116,6 @@ jobs:
         cd /opt/artdaq
         source /opt/artdaq/artdaq_demo_rte.sh || exit 1
 
-        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        export pkgname=\${REPO//_/-}
-        echo "Copying /scratch/art-daq/\$REPO to srcs \$pkgname"
-        cd srcs
-        if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
-        cp -pr /scratch/art-daq/\$REPO \$pkgname
-        cd \$pkgname
-        git config --global --add safe.directory \$PWD
-        export ref=\$(git describe --all)
-        echo "Described current ref as \${ref}"
-        branch=develop
-
-        if [[ "x\${ref}" =~ "xheads/" ]]; then
-            echo "Setting branch to \${ref//heads\//}"
-            branch=\${ref//heads\//}
-        fi
-
-        echo "Checking out \$branch"
         cd  /opt/artdaq/srcs
         for pkg in */;do
             echo "Updating package \$pkg"
@@ -140,7 +150,8 @@ jobs:
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
 
-        run_integration_tests.sh --config demo -- --tmux 2>&1 | tee -a /scratch/art-daq/build.log
+        run_integration_tests.sh --config ${{matrix.config}} -- --tmux 2>&1 | tee -a /scratch/art-daq/build.log
+        check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/build.log
 
         exit \$res
         EOT
