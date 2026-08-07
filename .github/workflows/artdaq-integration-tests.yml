@@ -157,6 +157,11 @@ jobs:
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
 
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
+        grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ${{ github.workspace }}/scratch/art-daq/build.log`
+        if [ $grepcount -gt 0 ]; then
+            echo "Integration tests failed"
+            exit 1
+        fi
 
     - name: upload build log file
       if: always()
