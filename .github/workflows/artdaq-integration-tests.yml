@@ -103,7 +103,7 @@ jobs:
     - name: Pull current Docker image
       run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
 
-    - name: run build in docker container with cvmfs bind mount
+    - name: run integration test in docker container with cvmfs bind mount
       run: |
 
         cd $GITHUB_WORKSPACE/scratch
@@ -172,7 +172,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: build_log
+        name: ${{ matrix.config }}_log
         path: ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
 
     - name: change dir permission again
