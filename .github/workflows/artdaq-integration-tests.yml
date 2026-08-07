@@ -134,21 +134,21 @@ jobs:
 
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         echo "Starting build"
-        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
+        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         if [ \$res -eq 0 ]; then
           cd build
-          ninja install 2>&1 | tee -a /scratch/Mu2e/build.log
+          ninja install 2>&1 | tee -a /scratch/Mu2e/${{ matrix.config }}.log
           res=\${PIPESTATUS[0]}
           cd ..
         fi
 
         echo "Spack install completed with status code \$res"
-        echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
+        echo "Spack install completed with status code \$res" >>/scratch/art-daq/${{ matrix.config }}.log
 
-        run_integration_tests.sh --config ${{matrix.config}} -- --tmux 2>&1 | tee -a /scratch/art-daq/build.log
-        check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/build.log
+        run_integration_tests.sh --config ${{matrix.config}} -- --tmux 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
+        check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
 
         exit \$res
         EOT
@@ -156,8 +156,9 @@ jobs:
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
 
-        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
-        grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ${{ github.workspace }}/scratch/art-daq/build.log`
+
+        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
+        grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log`
         if [ $grepcount -gt 0 ]; then
             echo "Integration tests failed"
             exit 1
@@ -168,7 +169,7 @@ jobs:
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: build_log
-        path: ${{ github.workspace }}/scratch/art-daq/build.log
+        path: ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
 
     - name: change dir permission again
       if: always()
