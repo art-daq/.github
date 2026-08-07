@@ -150,10 +150,7 @@ jobs:
         run_integration_tests.sh --config ${{matrix.config}} -- --tmux 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
         check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
 
-        grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" /scratch/art-daq/${{ matrix.config }}.log
-        export grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" /scratch/art-daq/${{ matrix.config }}.log`
-        echo "grepcount=$grepcount"
-        if [ ${grepcount:-1} -gt 0 ]; then
+        if [ `grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" /scratch/art-daq/${{ matrix.config }}.log` -gt 0 ]; then
             echo "${{ matrix.config }} Integration test failed"
             res=1
         else
