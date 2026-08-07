@@ -158,7 +158,7 @@ jobs:
 
 
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
-        grep -v "WITH CONFIGURATION ${{ matrix.config }} HAS NO DATA" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
+        grep -v "WITH CONFIGURATION ${{ matrix.config }} HAS NO DATA" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log >/dev/null
 
     - name: upload build log file
       if: always()
