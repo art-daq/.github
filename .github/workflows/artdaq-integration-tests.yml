@@ -139,7 +139,7 @@ jobs:
 
         if [ \$res -eq 0 ]; then
           cd build
-          ninja install 2>&1 | tee -a /scratch/Mu2e/${{ matrix.config }}.log
+          ninja install 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
           res=\${PIPESTATUS[0]}
           cd ..
         fi
@@ -150,6 +150,14 @@ jobs:
         run_integration_tests.sh --config ${{matrix.config}} -- --tmux 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
         check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
 
+        grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" /scratch/art-daq/${{ matrix.config }}.log`
+        if [ $grepcount -gt 0 ]; then
+            echo "${{ matrix.config }} Integration test failed"
+            res=1
+        else
+            echo "${{ matrix.config }} Integration test succeeded"
+        fi
+
         exit \$res
         EOT
         chmod +x build_pkg.sh
@@ -158,11 +166,7 @@ jobs:
 
 
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
-        grepcount=`grep -c "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log`
-        if [ $grepcount -gt 0 ]; then
-            echo "Integration tests failed"
-            exit 1
-        fi
+        grep "${{ matrix.config }} Integration test succeeded" ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
 
     - name: upload build log file
       if: always()
