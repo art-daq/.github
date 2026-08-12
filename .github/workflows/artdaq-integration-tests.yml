@@ -113,6 +113,23 @@ jobs:
         cd /opt/artdaq
         source /opt/artdaq/artdaq_demo_rte.sh || exit 1
 
+        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+        export pkgname=\${REPO//_/-}
+        echo "Copying /scratch/art-daq/\$REPO to srcs \$pkgname"
+        cd srcs
+        if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
+        cp -pr /scratch/art-daq/\$REPO \$pkgname
+        cd \$pkgname
+        git config --global --add safe.directory \$PWD
+        export ref=\$(git describe --all)
+        echo "Described current ref as \${ref}"
+        branch=develop
+
+        if [[ "x\${ref}" =~ "xheads/" ]]; then
+            echo "Setting branch to \${ref//heads\//}"
+            branch=\${ref//heads\//}
+        fi
+
         cd  /opt/artdaq/srcs
         for pkg in */;do
             echo "Updating package \$pkg"
