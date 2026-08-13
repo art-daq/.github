@@ -151,25 +151,34 @@ jobs:
 
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         echo "Starting build"
-        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
-        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 >/dev/null
+        res=\$?
 
         if [ \$res -eq 0 ]; then
           cd build
-          ninja install 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
-          res=\${PIPESTATUS[0]}
+          ninja install 2>&1 >/dev/null
+          res=\$?
           cd ..
         fi
 
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/${{ matrix.config }}.log
 
-        # Remove build directory
+        echo "Disk usage before removing build"
+        df -h
         rm -rf build
+        echo "Disk usage after removing build"
+        df -h
 
         run_integration_tests.sh --config ${{matrix.config}} --tmux 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
+
+        echo "Disk usage before running check_integration_tests.sh"
+        df -h
         check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
         res=\${PIPESTATUS[0]}
+
+        echo "Disk usage after running check_integration_tests.sh"
+        df -h
 
         echo "Integration tests completed, checks completed with status code \$res"
         echo "Integration tests completed, checks completed with status code \$res" >>/scratch/art-daq/${{ matrix.config }}.log
