@@ -1,0 +1,4 @@
+{
+    "name": "Run the integration tests",
+    "description": "Runs the integration tests on an artdaq-suite development area"
+}
