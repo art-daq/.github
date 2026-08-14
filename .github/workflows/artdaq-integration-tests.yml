@@ -164,21 +164,9 @@ jobs:
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/${{ matrix.config }}.log
 
-        echo "Disk usage before removing build"
-        df -h
-        rm -rf build
-        echo "Disk usage after removing build"
-        df -h
-
         run_integration_tests.sh --config ${{matrix.config}} --tmux 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
-
-        echo "Disk usage before running check_integration_tests.sh"
-        df -h
         check_integration_tests.sh 2>&1 | tee -a /scratch/art-daq/${{ matrix.config }}.log
         res=\${PIPESTATUS[0]}
-
-        echo "Disk usage after running check_integration_tests.sh"
-        df -h
 
         echo "Integration tests completed, checks completed with status code \$res"
         echo "Integration tests completed, checks completed with status code \$res" >>/scratch/art-daq/${{ matrix.config }}.log
