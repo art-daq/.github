@@ -62,7 +62,7 @@ jobs:
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
 
-    - uses: cvmfs-contrib/github-action-cvmfs@d79d292a9fc4a1d34fe5caa390308d0ec4ffe993
+    - uses: cvmfs-contrib/github-action-cvmfs@72f2a8d366043978d6aebee154bc9ed321c2f2a8
 
     - name: test cvmfs
       run: |
