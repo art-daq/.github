@@ -129,7 +129,7 @@ jobs:
         lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov -i -d build -o artdaq.base
 
         spack mpd test
-        #run_integration_tests.sh --runduration 30
+        run_integration_tests.sh --config demo --tmux --runduration 30
 
         lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --ignore-errors negative,negative --capture --output-file artdaq.info
         lcov -a artdaq.base -a artdaq.info --output-file artdaq.total
