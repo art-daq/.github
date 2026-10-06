@@ -152,9 +152,10 @@ jobs:
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
         echo "Running dune-cpp-style-check.sh on changed files"
+        touch /scratch/art-daq/build.log
         for file in $(echo "$names"|tr '\n' ' '); do
             if [[ "\$file" =~ ^.*cc$ || "\$file" =~ ^.*cpp$ || "\$file" =~ ^.*hh$ ]]; then
-              /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "\$file" "$exclude_regex" 2>&1 | tee -a /scratch/art-daq/build.log
+              /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "/scratch/${{ github.repository }}/\$file" "$exclude_regex" 2>&1 | tee -a /scratch/art-daq/build.log
             fi
         done
 
