@@ -104,6 +104,9 @@ jobs:
 
         cd $GITHUB_WORKSPACE/scratch
 
+        cat << EOT > build_pkg.sh
+        #!/bin/bash
+
         working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
         setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/setupARTDAQDEMO', '/opt/otsdaq/setup_ots.sh') }}
         image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
@@ -127,27 +130,27 @@ jobs:
         echo "Excluding files from checks via \${exclude_regex}"
 
         against=${{ inputs.against-ref }}
-        if [ "x$against" == "x" ] || [ "x$against" == "x0" ]; then
-            against=$(git hash-object -t tree /dev/null)
+        if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
+            against=\$(git hash-object -t tree /dev/null)
         fi
-        echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
-        cd ${{ github.repository }}
-        names=$( git diff --cached --name-only --diff-filter=AM  $against )
+        echo "Checking for formatting issues introduced since commit \$against"
 
-        if [ "x$names" == "x" ]; then
+        names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
+
+        if [ \${PIPESTATUS[0]} -ne 0 ]; then
+            echo "Error running git diff command"
+            echo "Error running git diff command" >>/scratch/art-daq/build.log
+            exit 1
+        fi
+
+        if [ "x\$names" == "x" ]; then
             echo "No changed files"
-            echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
+            echo "No changed files" >>/scratch/art-daq/build.log
             exit 0
         fi
-        #echo "Changed files to tidy: $names"
 
-        cd $GITHUB_WORKSPACE/scratch
-
-        cat << EOT > build_pkg.sh
-        #!/bin/bash
-
-        cd $working_dir
-        source $setup_script || exit 1
+        cd \$working_dir
+        source \$setup_script || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
 
@@ -159,15 +162,15 @@ jobs:
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp $working_dir/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        cp \$working_dir/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
         echo "Running dune-cpp-style-check.sh on changed files"
         touch /scratch/art-daq/build.log
-        for file in $(echo "$names"|tr '\n' ' '); do
-            if [[ "\$file" =~ ^.*cc$ || "\$file" =~ ^.*cpp$ || "\$file" =~ ^.*hh$ ]]; then
-              /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "/scratch/${{ github.repository }}/\$file" "$exclude_regex" 2>&1 | tee -a /scratch/art-daq/build.log
+        for file in \$(echo "\$names"|tr '\n' ' '); do
+            if [[ "\$file" =~ ^.*cc\$ || "\$file" =~ ^.*cpp\$ || "\$file" =~ ^.*hh\$ ]]; then
+              /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "/scratch/${{ github.repository }}/\$file" 2>&1 | tee -a /scratch/art-daq/build.log
             fi
         done
 
