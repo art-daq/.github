@@ -1,4 +1,4 @@
-name: Run Clang-Tidy Workflow (artdaq version)
+name: Run Clang-Tidy Workflow
 
 permissions:
   contents: read
@@ -95,7 +95,7 @@ jobs:
       if: ${{ inputs.otsdaq-mode == false }}
       run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
 
-    - name: Pull current artdaq Docker image
+    - name: Pull current otsdaq Docker image
       if: ${{ inputs.otsdaq-mode == true }}
       run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
 
@@ -139,7 +139,7 @@ jobs:
             echo "No changed files" >$GITHUB_WORKSPACE/scratch/art-daq/build.log
             exit 0
         fi
-        echo "Changed files to tidy: $names"
+        #echo "Changed files to tidy: $names"
 
         cd $GITHUB_WORKSPACE/scratch
 

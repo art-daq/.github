@@ -1,4 +1,4 @@
-name: Build otsdaq suite against develop
+name: Build artdaq suite against develop
 
 permissions:
   contents: read
@@ -7,6 +7,11 @@ permissions:
 # or API.
 on:
   workflow_call:
+    inputs:
+        otsdaq-mode:
+            required: false
+            type: boolean
+            default: false
 
 jobs:
   build_against_dev_release:
@@ -75,18 +80,28 @@ jobs:
         sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
         sudo chmod -R 700 /var/lib/cvmfs
 
-    - name: Pull current Docker image
+    - name: Pull current artdaq Docker image
+      if: ${{ inputs.otsdaq-mode == false }}
+      run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
+
+    - name: Pull current otsdaq Docker image
+      if: ${{ inputs.otsdaq-mode == true }}
       run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
 
     - name: run build in docker container with cvmfs bind mount
       run: |
 
         cd $GITHUB_WORKSPACE/scratch
+
+        working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
+        setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/artdaq_demo_rte', '/opt/otsdaq/setup_ots_rte.sh') }}
+        image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
+
         cat << EOT > build_pkg.sh
         #!/bin/bash
 
-        cd /opt/otsdaq
-        source /opt/otsdaq/setup_ots_rte.sh || exit 1
+        cd $working_dir
+        source $setup_script || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         export pkgname=\${REPO//_/-}
@@ -106,7 +121,7 @@ jobs:
         fi
 
         echo "Checking out \$branch"
-        cd  /opt/otsdaq/srcs
+        cd  $working_dir/srcs
         for pkg in */;do
             echo "Updating package \$pkg"
             cd \$pkg
@@ -116,16 +131,16 @@ jobs:
             git pull
             cd ..
         done
+        cd $working_dir
 
-        export OTS_DOXY="DOIT"
         # Have to re-add here in case architecture is different
-        cd /opt/otsdaq
-        spack config add config:mpd_user_dir:/opt/otsdaq/spack-repos/mpd/
-        export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
+        cd $working_dir
+        spack config add config:mpd_user_dir:$working_dir/spack-repos/mpd/
 
         # Cleanup old docs
         rm -rf build/*/doc
 
+        export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         echo "Starting build"
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
@@ -142,8 +157,8 @@ jobs:
 
         echo "Collecting Doxygen"
         mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
-        for dir in /opt/otsdaq/build/*/doc/html;do
-            thispkg=\`echo \$dir|sed 's|/opt/otsdaq/build/||;s|/doc/html||'\`
+        for dir in $working_dir/build/*/doc/html;do
+            thispkg=\`echo \$dir|sed 's|$working_dir/build/||;s|/doc/html||'\`
             echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
             cp -a \$dir /scratch/art-daq/docs/\$thispkg
         done
@@ -154,7 +169,7 @@ jobs:
         EOT
         chmod +x build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/otsdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch $image /scratch/build_pkg.sh
 
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
 
@@ -166,6 +181,7 @@ jobs:
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload Doxygen docs
+      if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
         name: doxygen

@@ -1,4 +1,4 @@
-name: Run Clang-Format Workflow (artdaq version)
+name: Run Clang-Format Workflow
 
 permissions:
   contents: read
@@ -80,7 +80,7 @@ jobs:
         sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
         sudo chmod -R 700 /var/lib/cvmfs
 
-    - name: Pull current Docker image
+    - name: Pull current artdaq Docker image
       run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
 
     - name: run clang-format in docker container with cvmfs bind mount

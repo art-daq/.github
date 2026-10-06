@@ -1,17 +1,20 @@
-name: Build artdaq suite against develop
+name: Test Single Pkg Workflow
 
 permissions:
   contents: read
 
-# Controls when the action will run. Workflow runs when manually triggered using the UI
-# or API.
 on:
   workflow_call:
+    inputs:
+        otsdaq-mode:
+            required: false
+            type: boolean
+            default: false
 
 jobs:
-  build_against_dev_release:
-    name: build_against_dev
-    # The type of runner that the job will run on
+
+  build_single_pkg:
+    name: test single pkg
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -58,6 +61,7 @@ jobs:
         echo "Using tag $tag"
         echo "tag=${tag}" >>$GITHUB_OUTPUT
 
+
     - name: change dir permission
       run: |
         sudo mkdir -p /var/lib/cvmfs
@@ -75,88 +79,70 @@ jobs:
         sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
         sudo chmod -R 700 /var/lib/cvmfs
 
-    - name: Pull current Docker image
+    - name: Pull current artdaq Docker image
+      if: ${{ inputs.otsdaq-mode == false }}
       run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
+
+    - name: Pull current otsdaq Docker image
+      if: ${{ inputs.otsdaq-mode == true }}
+      run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
 
     - name: run build in docker container with cvmfs bind mount
       run: |
 
         cd $GITHUB_WORKSPACE/scratch
+
+        working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
+        setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/artdaq_demo_rte.sh', '/opt/otsdaq/setup_ots_rte.sh') }}
+        image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
+
         cat << EOT > build_pkg.sh
         #!/bin/bash
 
-        cd /opt/artdaq
-        source /opt/artdaq/artdaq_demo_rte.sh || exit 1
+        cd $working_dir
+        source $setup_script || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        export pkgname=\${REPO//_/-}
-        echo "Copying /scratch/art-daq/\$REPO to srcs \$pkgname"
-        cd srcs
-        if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
-        cp -pr /scratch/art-daq/\$REPO \$pkgname
-        cd \$pkgname
-        git config --global --add safe.directory \$PWD
-        export ref=\$(git describe --all)
-        echo "Described current ref as \${ref}"
-        branch=develop
-
-        if [[ "x\${ref}" =~ "xheads/" ]]; then
-            echo "Setting branch to \${ref//heads\//}"
-            branch=\${ref//heads\//}
-        fi
-
-        echo "Checking out \$branch"
-        cd  /opt/artdaq/srcs
-        for pkg in */;do
-            echo "Updating package \$pkg"
-            cd \$pkg
-            git stash
-            git checkout \$branch
-            git stash pop
-            git pull
-            cd ..
-        done
-        cd /opt/artdaq
-
-        # Have to re-add here in case architecture is different
-        cd /opt/artdaq
-        spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
-
-        # Cleanup old docs
-        rm -rf build/*/doc
+        mkdir /scratch/art-daq/build_\$REPO
+        cd /scratch/art-daq/build_\$REPO
 
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
-        echo "Starting build"
-        spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
+        export CET_PLUGIN_PATH=\$PWD/lib:\$CET_PLUGIN_PATH
+        export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
+        echo "Compiler is \$compiler"
+        cp $working_dir/srcs/CMakePresets.json /scratch/art-daq/\$REPO
+        echo "Configuring with cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev"
+        cmake --preset default /scratch/art-daq/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev
+
+        res=\$?
+        if [ \$res -ne 0 ]; then
+            echo "CMake configuration failed with status code \$res"
+            echo "CMake configuration failed with status code \$res" >>/scratch/art-daq/build.log
+            exit \$res
+        fi
+
+        echo "Compiling code"
+        make -j\$CETPKG_J 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         if [ \$res -eq 0 ]; then
-          cd build
-          ninja install 2>&1 | tee -a /scratch/Mu2e/build.log
-          res=\${PIPESTATUS[0]}
-          cd ..
+            echo "Starting tests"
+            make test 2>&1 | tee -a /scratch/art-daq/build.log
+            res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
 
-        echo "Spack install completed with status code \$res"
-        echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
-
-        echo "Collecting Doxygen"
-        mkdir -p /scratch/art-daq/docs && rm -rf /scratch/art-daq/docs/*
-        for dir in /opt/artdaq/build/*/doc/html;do
-            thispkg=\`echo \$dir|sed 's|/opt/artdaq/build/||;s|/doc/html||'\`
-            echo "Copying \$dir to /scratch/art-daq/docs/\$thispkg"
-            cp -a \$dir /scratch/art-daq/docs/\$thispkg
-        done
-        echo "Contents of docs after collection"
-        ls /scratch/art-daq/docs
+        echo "Copying testing logs"
+        mkdir -p /scratch/art-daq/Testing
+        cp /scratch/art-daq/build_\$REPO/Testing/Temporary/*.log /scratch/art-daq/Testing
 
         exit \$res
         EOT
         chmod +x build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch $image /scratch/build_pkg.sh
 
-        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
+        grep "100% tests passed, 0 tests failed" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No tests were found!!!" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
       if: always()
@@ -165,12 +151,12 @@ jobs:
         name: build_log
         path: ${{ github.workspace }}/scratch/art-daq/build.log
 
-    - name: upload Doxygen docs
+    - name: Upload testing log file(s)
       if: always()
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: doxygen
-        path: ${{ github.workspace }}/scratch/art-daq/docs
+        name: test_logs
+        path: ${{ github.workspace }}/scratch/art-daq/Testing
 
     - name: change dir permission again
       if: always()
