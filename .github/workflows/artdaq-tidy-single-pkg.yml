@@ -138,7 +138,7 @@ jobs:
         source /opt/artdaq/setupARTDAQDEMO || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        names="echo "$names"|tr '\n' ' '"
+        names=$(echo "$names"|tr '\n' ' ')
 
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
