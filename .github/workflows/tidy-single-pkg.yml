@@ -12,6 +12,10 @@ on:
         exclude-directories:
             required: false
             type: string
+        otsdaq-mode:
+            required: false
+            type: boolean
+            default: false
 
 jobs:
 
@@ -87,14 +91,22 @@ jobs:
         sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
         sudo chmod -R 700 /var/lib/cvmfs
 
-    - name: Pull current Docker image
+    - name: Pull current artdaq Docker image
+      if: ${{ inputs.otsdaq-mode == false }}
       run: docker image pull ghcr.io/art-daq/artdaq-spack:latest
+
+    - name: Pull current artdaq Docker image
+      if: ${{ inputs.otsdaq-mode == true }}
+      run: docker image pull ghcr.io/art-daq/otsdaq-spack:latest
 
     - name: run clang-tidy in docker container with cvmfs bind mount
       run: |
 
         cd $GITHUB_WORKSPACE/scratch
 
+        working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
+        setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/setupARTDAQDEMO', '/opt/otsdaq/setup_ots.sh') }}
+        image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
@@ -134,8 +146,8 @@ jobs:
         cat << EOT > build_pkg.sh
         #!/bin/bash
 
-        cd /opt/artdaq
-        source /opt/artdaq/setupARTDAQDEMO || exit 1
+        cd $working_dir
+        source $setup_script || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
 
@@ -147,7 +159,7 @@ jobs:
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp /opt/artdaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        cp $working_dir/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
@@ -159,12 +171,12 @@ jobs:
             fi
         done
 
-        exit \$(wc -l /scratch/art-daq/build.log)
+        exit \$(wc -l /scratch/art-daq/build.log|awk '{print \$1}')
         EOT
         chmod +x build_pkg.sh
-        cat build_pkg.sh
+        #cat build_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/art-daq/artdaq-spack:latest /scratch/build_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch $image /scratch/build_pkg.sh
 
         grep "Clang-tidy completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/art-daq/build.log
