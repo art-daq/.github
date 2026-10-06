@@ -138,6 +138,7 @@ jobs:
         source /opt/artdaq/setupARTDAQDEMO || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+        names="echo "$names"|tr '\n' ' '"
 
         mkdir /scratch/art-daq/build_\$REPO
         cd /scratch/art-daq/build_\$REPO
@@ -152,8 +153,10 @@ jobs:
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
         echo "Running dune-cpp-style-check.sh on changed files"
-        for file in "$names"; do
-            /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "\$file" "$exclude_regex" 2>&1 | tee -a /scratch/art-daq/build.log
+        for file in "\$names"; do
+            if [[ "\$file" =~ ^.*cc$ || "\$file" =~ ^.*cpp$ || "\$file" =~ ^.*hh$ ]]; then
+              /scratch/styleguide/cpplint/dune-cpp-style-check.sh /scratch/art-daq/build_\$REPO "\$file" "$exclude_regex" 2>&1 | tee -a /scratch/art-daq/build.log
+            fi
         done
 
         exit \$(wc -l /scratch/art-daq/build.log)
