@@ -111,6 +111,9 @@ jobs:
         cat << EOT > build_pkg.sh
         #!/bin/bash
 
+        cd /scratch/${{ github.repository }}
+        git config --global --add safe.directory \$PWD
+
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
@@ -134,7 +137,7 @@ jobs:
         if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
             against=\$(git hash-object -t tree /dev/null)
         fi
-        echo "Checking for formatting issues introduced since commit \$against"
+        echo "Checking for linting issues introduced since commit \$against"
 
         names=\$( git diff --cached --name-only --diff-filter=AM  \$against | grep -vE "\${exclude_regex}" )
 
