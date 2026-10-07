@@ -94,7 +94,7 @@ jobs:
         cd $GITHUB_WORKSPACE/scratch
 
         working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
-        setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/artdaq_demo_rte', '/opt/otsdaq/setup_ots_rte.sh') }}
+        setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/artdaq_demo_rte.sh', '/opt/otsdaq/setup_ots_rte.sh') }}
         image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
 
         cat << EOT > build_pkg.sh
