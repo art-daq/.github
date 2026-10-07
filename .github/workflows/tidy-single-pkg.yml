@@ -108,6 +108,11 @@ jobs:
         setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/setupARTDAQDEMO', '/opt/otsdaq/setup_ots.sh') }}
         image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
 
+        if [ -f ${{ github.repository }}/.clang_tidy_ci_disabled ]; then
+          echo "Clang-tidy CI is disabled for this repository"
+          exit 0
+        fi
+
         cat << EOT > build_pkg.sh
         #!/bin/bash
 
