@@ -104,12 +104,13 @@ jobs:
 
         cd $GITHUB_WORKSPACE/scratch
 
-        cat << EOT > build_pkg.sh
-        #!/bin/bash
-
         working_dir=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq', '/opt/otsdaq') }}
         setup_script=${{ case(inputs.otsdaq-mode == false, '/opt/artdaq/setupARTDAQDEMO', '/opt/otsdaq/setup_ots.sh') }}
         image=${{ case(inputs.otsdaq-mode == false, 'ghcr.io/art-daq/artdaq-spack:latest', 'ghcr.io/art-daq/otsdaq-spack:latest') }}
+
+        cat << EOT > build_pkg.sh
+        #!/bin/bash
+
         excluded_dirs="${{ inputs.exclude-directories }}"
         exclude_regex="^(nothingtoseehere"
 
@@ -149,8 +150,8 @@ jobs:
             exit 0
         fi
 
-        cd \$working_dir
-        source \$setup_script || exit 1
+        cd $working_dir
+        source $setup_script || exit 1
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
 
@@ -162,7 +163,7 @@ jobs:
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp \$working_dir/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        cp $working_dir/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
 
