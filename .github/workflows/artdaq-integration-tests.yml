@@ -185,14 +185,14 @@ jobs:
 
     - name: upload build log file
       if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
       with:
         name: ${{ matrix.config }}_log
         path: ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.log
 
     - name: upload logs and data files
       if: always()
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
       with:
         name: ${{ matrix.config }}_data
         path: ${{ github.workspace }}/scratch/art-daq/${{ matrix.config }}.tar.bz2
