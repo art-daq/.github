@@ -123,6 +123,10 @@ jobs:
         echo "Checking out \$branch"
         cd  $working_dir/srcs
         for pkg in */;do
+            if [ "x\$pkg" == "x\$pkgname/" ]; then
+                echo "Skipping \$pkgname"
+                continue
+            fi
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
