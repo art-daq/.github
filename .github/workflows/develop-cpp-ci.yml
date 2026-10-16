@@ -111,14 +111,15 @@ jobs:
         cp -pr /scratch/art-daq/\$REPO \$pkgname
         cd \$pkgname
         git config --global --add safe.directory \$PWD
+        branch=\$(git branch --show-current)
         export ref=\$(git describe --all)
-        echo "Described current ref as \${ref}"
-        branch=develop
+        echo "Branch is \${branch}, Described current ref as \${ref}"
 
-        if [[ "x\${ref}" =~ "xheads/" ]]; then
+        if [[ "x\${branch}" == "x" ]] && [[ "x\${ref}" =~ "xheads/" ]]; then
             echo "Setting branch to \${ref//heads\//}"
             branch=\${ref//heads\//}
         fi
+        branch=\${branch:-develop}
 
         echo "Checking out \$branch"
         cd  $working_dir/srcs
