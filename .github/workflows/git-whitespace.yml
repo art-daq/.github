@@ -76,7 +76,6 @@ jobs:
 
         if [ \${PIPESTATUS[0]} -ne 0 ]; then
             echo "Error running git diff command"
-            echo "Error running git diff command" >>/scratch/art-daq/build.log
             exit 1
         fi
 
