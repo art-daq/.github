@@ -183,7 +183,7 @@ jobs:
             fi
         done
 
-        exit \$(wc -l /scratch/art-daq/build.log|awk '{print \$1}')
+        exit \$(cat /scratch/art-daq/build.log|grep -v "Processed 1 of 1 files" |wc -l|awk '{print \$1}')
         EOT
         chmod +x build_pkg.sh
         #cat build_pkg.sh
